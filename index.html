@@ -1,0 +1,368 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>财务管理工作台</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6fa;color:#17263b;font:15px system-ui,sans-serif}header{background:#10263a;color:white;padding:20px 5vw;display:flex;justify-content:space-between;align-items:center;gap:12px}header strong{font-size:20px}header a{color:#b8d7e4}nav{display:flex;gap:8px;flex-wrap:wrap;padding:16px 5vw;background:white;border-bottom:1px solid #dce5eb}main{max-width:1500px;margin:auto;padding:32px 5vw}h1{margin:0 0 8px;font-size:32px}h2{margin-top:0;font-size:20px}p{line-height:1.65}.muted,small{color:#526478}.cards,.panels{display:grid;gap:15px;margin:24px 0;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}.panels{grid-template-columns:repeat(auto-fit,minmax(min(100%,370px),1fr))}.card,.panel{background:white;border:1px solid #dce5eb;border-radius:14px;padding:20px}.card strong{display:block;font-size:25px;margin:9px 0;overflow-wrap:anywhere}button,input,select{font:inherit;padding:9px 12px;border:1px solid #b8c9d6;border-radius:8px;background:white;color:inherit}button{cursor:pointer}button.active,button.primary{background:#076c67;color:white;border-color:#076c67}button:disabled{opacity:.55;cursor:wait}form,.tools{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:16px 0}label{display:grid;gap:5px}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;white-space:nowrap}th,td{padding:12px;text-align:left;border-bottom:1px solid #e0e8ed}th{background:#f4f7fa}.late{color:#9c3829}.bar{height:10px;background:#e9eff3;border-radius:8px;overflow:hidden;margin:6px 0 12px}.fill{height:100%;background:#148981}.line{display:flex;justify-content:space-between;gap:8px}.empty{padding:16px 0;color:#526478}#notice{margin:0;white-space:pre-wrap}#notice:empty{display:none}.error{color:#9c3829}.ok{color:#076c67}@media(max-width:540px){header{align-items:flex-start;flex-direction:column}main{padding-top:22px}}
+body{--rail:#142536;--surface:#f5f7fb;--accent:#08796c;--stroke:#e0e7ee;background:var(--surface);font-family:"DM Sans","Microsoft YaHei",system-ui,sans-serif}
+.workspace{display:grid;grid-template-columns:228px minmax(0,1fr);min-height:100dvh}
+.sidebar{background:var(--rail);color:white;padding:25px 16px;position:sticky;top:0;height:100dvh;overflow:auto}
+.brand{display:flex;align-items:center;gap:11px;margin:0 3px 30px;font-size:16px;white-space:nowrap}
+.brand-mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:#126d64;color:#e2fff7;font-weight:700}
+.workspace nav{display:grid;gap:6px;padding:0;background:none;border:0}
+nav button{color:#ced9e4;background:transparent;border-color:transparent;text-align:left;padding:11px 13px;white-space:nowrap}
+nav button:hover{background:#203a4d;color:white}
+nav button.active{background:#23483f;border-color:#3a6b60;color:#eafff8}
+.content{min-width:0}
+header{min-height:68px;background:white;color:#17263b;border-bottom:1px solid var(--stroke);padding:12px clamp(16px,3vw,44px);font-size:14px}
+header strong{font-size:15px}header a{color:var(--accent)}#identity{overflow-wrap:anywhere;text-align:right}
+main{padding:30px clamp(16px,3vw,44px);max-width:1500px}
+h1{letter-spacing:-.02em}h2{letter-spacing:-.01em}
+.card,.panel{border-color:var(--stroke);box-shadow:0 2px 8px #12324908}
+.card{padding:18px 20px;border-top:3px solid #8cc1b2}
+.card strong,td,.line b{font-variant-numeric:tabular-nums}
+.period-control{margin:0 0 24px;gap:18px;padding:12px 16px}
+.period-control .tools{margin:0;gap:5px}
+.period-control button{min-width:46px;padding:7px 9px}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #68a9cb;outline-offset:2px}
+tbody tr:hover{background:#f5f9fa}
+@media(max-width:900px){
+ .workspace{grid-template-columns:minmax(0,1fr)}.sidebar{position:static;height:auto;padding:12px 16px}.brand{margin:0 0 10px}
+ .workspace nav{display:flex;flex-wrap:nowrap;overflow:auto}.workspace nav button{flex:none}
+}
+@media(max-width:540px){header{flex-direction:row;align-items:center}header strong{flex:none}main{padding-top:16px}.cards{grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}.card{padding:12px}.card strong{font-size:20px}}
+</style>
+<div class="workspace"><aside class="sidebar"><div class="brand"><span class="brand-mark" aria-hidden="true">财</span><strong>财务管理工作台</strong></div><nav id="nav" aria-label="工作台导航"></nav></aside><div class="content"><header><strong id="page-title">财务工作台</strong><span id="identity"></span></header><main><p id="notice" role="status"></p><section id="view"><p>正在连接财务工作台…</p></section></main></div></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=new Intl.NumberFormat('zh-CN',{style:'currency',currency:'CNY'});
+const yuan=v=>fmt.format(v/100);
+const pct=(n,d)=>d?(100*n/d).toFixed(1)+'%':'—';
+const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+const days=(a,b)=>Math.max(0,Math.round((Date.parse(a)-Date.parse(b))/86400000));
+const balance=r=>r.amount-r.paid;
+const sum=(a,f)=>a.reduce((s,v)=>s+f(v),0);
+const roleName={admin:'管理员',finance:'财务人员',viewer:'只读人员'};
+const specs={
+ ar:{title:'应收账款',fields:['单据编号','客户名称','开单日期','到期日期','应收金额','已收金额'],sample:['AR-001','示例客户','2026-11-01','2026-12-01',12000,3000]},
+ report:{title:'月度财务报表',fields:['月份','营业收入','营业成本','期间费用','经营现金流净额'],sample:['2026-11',100000,60000,20000,16000]}
+};
+let state,tab='dashboard',period='',statement='income',query='',filter='all',kind='ar',pending;
+const periodTabs=['dashboard','revenue','ar'];
+const currentPeriod=()=>today().slice(0,7);
+function periods(){
+ return [...new Set([...state.report.map(r=>r.id),...state.ar.map(r=>r.issued.slice(0,7))])].sort();
+}
+function periodControl(){
+ const year=period.slice(0,4);
+ const years=[...new Set([currentPeriod(),period,...periods()].map(v=>v.slice(0,4)))].sort().reverse();
+ return '<div class="panel tools period-control" role="group" aria-label="数据期间"><label>年份<select id="periodYear">'+years.map(y=>'<option '+(y===year?'selected':'')+'>'+y+'</option>').join('')+'</select></label><div role="group" aria-label="月份" class="tools">'+Array.from({length:12},(_,i)=>{
+  const value=year+'-'+String(i+1).padStart(2,'0');
+  return '<button data-period="'+value+'" aria-pressed="'+(value===period)+'" class="'+(value===period?'active':'')+'">'+(i+1)+'月</button>';
+ }).join('')+'</div></div>';
+}
+const periodReceivables=()=>state.ar.filter(r=>r.issued.startsWith(period+'-'));
+const canWrite=()=>state.role!=='viewer';
+const notify=(message,bad=false)=>{$('#notice').textContent=message;$('#notice').className=bad?'error':'ok'};
+async function api(path,data){
+ const r=await fetch('/api/'+path,data===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+ const body=await r.json();
+ if(!r.ok)throw Error(body.error);
+ return body;
+}
+async function refresh(){state=await api('state');render()}
+const title=(heading,sub)=>'<h1>'+heading+'</h1><p class="muted">'+sub+'</p>';
+const card=(name,value,detail)=>'<div class="card"><small>'+name+'</small><strong>'+value+'</strong><small>'+detail+'</small></div>';
+const grid=(heads,rows)=>rows.length?'<div class="scroll"><table><thead><tr>'+heads.map(s=>'<th>'+s+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(s=>'<td>'+s+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>':'<p class="empty">暂无符合条件的数据</p>';
+function dashboard(){
+ const t=today(),ar=periodReceivables(), reports=state.report.filter(r=>!r.cumulative&&r.id.slice(0,4)===period.slice(0,4)&&r.id<=period);
+ const report=state.report.find(r=>r.id===period);
+ const total=sum(ar,balance),overdue=sum(ar.filter(r=>r.due<t),balance);
+ const aging=[0,0,0,0,0];
+ for(const r of ar){const d=days(t,r.due);aging[d===0?0:d<=30?1:d<=60?2:d<=90?3:4]+=balance(r)}
+ const maximum=Math.max(...reports.map(r=>Math.abs(r.revenue)),1);
+ return title('财务概览','人民币 · 应收按开单月筛选，余额与逾期状态截至今天。')+
+ '<div class="cards">'+card('应收余额',yuan(total),'应收金额减已收金额')+card('逾期余额',yuan(overdue),'到期日早于今天的未收金额')+card('逾期率',pct(overdue,total),'逾期余额 ÷ 应收余额')+card('累计回款率',pct(sum(ar,r=>r.paid),sum(ar,r=>r.amount)),'已收金额 ÷ 应收金额')+'</div>'+
+ '<div class="panels"><div class="panel"><h2>应收账龄</h2>'+aging.map((v,i)=>'<div class="line"><span>'+['未逾期','1–30 天','31–60 天','61–90 天','90 天以上'][i]+'</span><b>'+yuan(v)+'</b></div><div class="bar"><div class="fill" style="width:'+(total?100*v/total:0)+'%"></div></div>').join('')+
+ '</div><div class="panel"><h2>本年收入趋势 · 截至所选月</h2>'+(reports.length?reports.map(r=>'<div class="line"><span>'+r.id+'</span><b>'+yuan(r.revenue)+'</b></div><div class="bar"><div class="fill" style="width:'+100*Math.abs(r.revenue)/maximum+'%"></div></div>').join(''):'<p class="empty">所选年度截至该月暂无收入数据。</p>')+'</div></div>'+
+ '<div class="panel"><h2>'+(report?.cumulative?'本年累计经营指标':'月度经营指标')+'</h2>'+(report?'<div class="cards">'+card('营业收入',yuan(report.revenue),'报表收入')+card('毛利率',pct(report.revenue-report.cost,report.revenue),'毛利 ÷ 营业收入')+card(report.company?'营业利润':'经营利润（简化口径）',yuan(report.operating??report.revenue-report.cost-report.expense),report.company?'合并利润表原值':'收入 − 营业成本 − 期间费用')+card('经营现金流净额',yuan(report.cash),'报表原值')+'</div>':'<p class="empty">所选月份暂无财务报表。</p>')+'</div>';
+}
+function revenues(){
+ const reports=state.report;
+ const current=reports.find(r=>r.id===period);
+ if(!current)return title('收入管理','所选月份暂无财务报表。');
+ const index=reports.indexOf(current);
+ const prior=reports[index-1];
+ const [year,m]=current.id.split('-').map(Number);
+ const previousId=m===1?(year-1)+'-12':year+'-'+String(m-1).padStart(2,'0');
+ const yoy=reports.find(r=>r.id===(year-1)+current.id.slice(4));
+ const change=base=>!current.cumulative&&!base?.cumulative&&base?.revenue?pct(current.revenue-base.revenue,Math.abs(base.revenue)):'—';
+ const detail=current.company?.[statement]||[];
+ const value=v=>v===null?'—':yuan(v);
+ return title('收入管理',current.cumulative?'截至所选月的本年累计收入和毛利。':'按月查看合并口径营业收入和毛利。')+
+ '<div class="cards">'+card('营业收入',yuan(current.revenue),current.cumulative?'本年累计':'报表当月')+(current.cumulative?'':card('收入环比',change(prior?.id===previousId?prior:null),'较上月')+card('收入同比',change(yoy),'较上年同月'))+card('毛利',yuan(current.revenue-current.cost),'毛利率 '+pct(current.revenue-current.cost,current.revenue))+'</div>'+
+ '<div class="panel"><h2>'+(current.cumulative?'本年累计收入台账':'月度收入台账')+'</h2>'+grid(['报表期间','营业收入','营业成本','毛利','毛利率'],[[current.id,yuan(current.revenue),yuan(current.cost),yuan(current.revenue-current.cost),pct(current.revenue-current.cost,current.revenue)]])+'</div>'+
+ (current.company?'<div class="panel"><h2>企业合并报表明细</h2><label>查看报表<select id="statement">'+[['income','合并利润表'],['balance','合并资产负债表'],['cashflow','合并现金流量表']].map(([k,v])=>'<option value="'+k+'" '+(k===statement?'selected':'')+'>'+v+'</option>').join('')+'</select></label>'+
+ grid(statement==='balance'?['科目','期末','期初']:['科目','当月','本年累计（原表）'],detail.map(([name,a,b])=>[esc(name),value(a),value(b)]))+'</div>':'');
+}
+function receivables(){
+ const t=today();
+ const status=r=>!balance(r)?'paid':r.due<t?'late':'open';
+ const list=periodReceivables().filter(r=>(filter==='all'||status(r)===filter)&&(r.id+' '+r.customer).toLowerCase().includes(query.toLowerCase()));
+ return title('应收账款','按开单月份筛选。余额和到期状态截至今天。')+
+ '<div class="tools"><input id="query" aria-label="客户或单据编号" placeholder="搜索客户或单据编号" value="'+esc(query)+'"><select id="filter" aria-label="单据状态">'+[['all','全部状态'],['open','未到期'],['late','已逾期'],['paid','已结清']].map(([k,v])=>'<option value="'+k+'" '+(k===filter?'selected':'')+'>'+v+'</option>').join('')+'</select><small>共 '+list.length+' 笔</small></div><div class="panel">'+grid(['单据编号','客户','到期日','应收','已收','余额','状态',...(canWrite()?['操作']:[])],list.map(r=>[esc(r.id),esc(r.customer),r.due,yuan(r.amount),yuan(r.paid),yuan(balance(r)),{paid:'已结清',late:'<span class="late">已逾期</span>',open:'未逾期'}[status(r)],...(canWrite()?[balance(r)?'<button data-payment="'+esc(r.id)+'">登记回款</button>':'—']:[])]))+'</div>';
+}
+function imports(){
+ if(kind==='company')return title('Excel 导入','上传公司原格式的合并财务报表。')+
+ '<div class="panel"><label>数据类型<select id="kind"><option value="ar">应收账款</option><option value="report">月度财务报表</option><option value="company" selected>公司合并财务报表</option></select></label><p>读取合并资产负债表、合并利润表及合并现金流量表。按封账日期导入当年已结束的月份。</p><label>选择原格式 .xlsx<input type="file" id="file" accept=".xlsx"></label></div>'+
+ (pending?'<div class="panel"><h2>预览合并报表</h2><p>'+pending.length+' 个月，已有 '+pending.filter(r=>state.report.some(s=>s.id===r.id)).length+' 个月将更新。</p>'+grid(['月份','营业收入','营业成本','营业利润','经营现金流净额'],pending.map(r=>[r.id,yuan(r.revenue),yuan(r.cost),yuan(r.operating),yuan(r.cash)]))+'<p><button id="commit" class="primary">确认导入 '+pending.length+' 个月</button></p></div>':'');
+ if(kind==='report')return title('Excel 导入','请使用公司的月度财务报表模板。')+
+ '<div class="panel"><h2>选择数据类型</h2><div class="tools"><select id="kind" aria-label="数据类型"><option value="ar">应收账款</option><option value="report" selected>月度财务报表</option><option value="company">公司合并财务报表</option></select><a href="/monthly-template.xlsx" download="月度财务报表模版.xlsx">下载公司月度财务报表模板（XLSX）</a></div><p class="muted">填写三张合并主表的期末、期初及本年累计数据。累计版按报表日期入库。</p><label>选择报表文件<input type="file" id="file" accept=".xlsx,.csv"></label></div>'+
+ (pending?'<div class="panel"><h2>预览月度报表</h2><p>'+pending.length+' 个期间，已有 '+pending.filter(r=>state.report.some(s=>s.id===r.id)).length+' 个期间将更新。</p>'+grid(['月份','口径','营业收入','营业成本','期间费用','经营现金流净额'],pending.map(r=>[r.id,r.cumulative?'本年累计':'当月',yuan(r.revenue),yuan(r.cost),yuan(r.expense),yuan(r.cash)]))+'<p><button id="commit" class="primary">确认导入</button></p></div>':'');
+ const spec=specs[kind];
+ return title('Excel 导入','读取第一个工作表。金额用人民币元，日期用 YYYY-MM-DD，月份用 YYYY-MM。')+
+ '<div class="panel"><h2>选择数据类型</h2><div class="tools"><select id="kind" aria-label="数据类型"><option value="ar">应收账款</option><option value="report" '+(kind==='report'?'selected':'')+'>月度财务报表</option><option value="company">公司合并财务报表</option></select><button id="template">下载 Excel 可打开的 CSV 模板</button></div><p class="muted">必填列 · '+spec.fields.join('、')+'</p><p class="muted">同编号或同月份的导入记录将替换旧记录，应收表的已收金额也会更新。每批最多 500 行。</p><label>选择 .xlsx 或 .csv 文件<input type="file" id="file" accept=".xlsx,.csv"></label></div>'+
+ (pending?'<div class="panel"><h2>导入预览</h2><p>'+pending.length+' 行，已有记录将更新 '+pending.filter(r=>state[kind].some(s=>s.id===r.id)).length+' 行。</p>'+grid(spec.fields,pending.slice(0,8).map(r=>Object.values(r).map(v=>typeof v==='number'?yuan(v):esc(v))))+'<p><button id="commit" class="primary">确认导入 '+pending.length+' 行</button></p></div>':'');
+}
+function members(){
+ return title('人员与权限','成员使用自己的 ChatGPT 账号登录。站点访问名单与这里的业务角色均需授权。')+
+ '<div class="panel"><h2>成员角色</h2><p>管理员可管理成员、导入数据和登记回款。财务人员可导入和登记回款。只读人员可查看看板和应收台账。</p><form id="member"><label>登录邮箱<input name="email" type="email" required></label><label>角色<select name="role"><option value="viewer">只读人员</option><option value="finance">财务人员</option><option value="admin">管理员</option><option value="remove">撤销角色</option></select></label><button class="primary">保存</button></form>'+
+ grid(['登录邮箱','业务角色'],state.members.map(m=>[esc(m.email),roleName[m.role]]))+'</div>';
+}
+function render(){
+ if(!period)period=periods().at(-1)||currentPeriod();
+ $('#identity').innerHTML=esc(state.email)+' · '+roleName[state.role]+'　<a href="/signout-with-chatgpt" target="_top">退出</a>';
+ const tabs=[['dashboard','BI 看板'],['revenue','收入管理'],['ar','应收账款'],...(canWrite()?[['import','Excel 导入']]:[]),...(state.role==='admin'?[['members','人员权限']]:[])];
+ if(!tabs.some(([k])=>k===tab))tab='dashboard';
+ $('#page-title').textContent=tabs.find(([k])=>k===tab)[1];
+ $('#nav').innerHTML=tabs.map(([k,v])=>'<button class="'+(tab===k?'active':'')+'" aria-current="'+(tab===k?'page':'false')+'" data-tab="'+k+'">'+v+'</button>').join('');
+ $('#view').innerHTML=(periodTabs.includes(tab)?periodControl():'')+({dashboard,revenue:revenues,ar:receivables,import:imports,members})[tab]();
+}
+function csv(text){
+ const rows=[];let row=[],field='',quote=false;
+ for(let i=0;i<text.length;i++){
+  const c=text[i];
+  if(quote){if(c==='"'&&text[i+1]==='"'){field+='"';i++}else if(c==='"')quote=false;else field+=c}
+  else if(c==='"'&&!field)quote=true;
+  else if(c===','){row.push(field);field=''}
+  else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;rows.push([...row,field]);row=[];field=''}
+  else field+=c;
+ }
+ if(quote)throw Error('CSV 中有未闭合的引号');
+ rows.push([...row,field]);return rows;
+}
+async function xlsx(buffer,company=false){
+ const d=new DataView(buffer), bytes=new Uint8Array(buffer), dec=new TextDecoder();
+ let end=d.byteLength-22;
+ while(end>=Math.max(0,d.byteLength-65557)&&d.getUint32(end,true)!==0x06054b50)end--;
+ if(end<0||d.getUint32(end,true)!==0x06054b50)throw Error('无法读取 XLSX 文件');
+ let off=d.getUint32(end+16,true);const files=new Map();
+ for(let n=0;n<d.getUint16(end+10,true);n++){
+  if(d.getUint32(off,true)!==0x02014b50)throw Error('XLSX 压缩目录损坏');
+  const len=d.getUint16(off+28,true),name=dec.decode(bytes.subarray(off+46,off+46+len));
+  files.set(name,{method:d.getUint16(off+10,true),size:d.getUint32(off+20,true),unpacked:d.getUint32(off+24,true),at:d.getUint32(off+42,true)});
+  off+=46+len+d.getUint16(off+30,true)+d.getUint16(off+32,true);
+ }
+ async function xml(name){
+  const f=files.get(name);if(!f)return null;
+  if(f.unpacked>12000000)throw Error('工作表过大');
+  const start=f.at+30+d.getUint16(f.at+26,true)+d.getUint16(f.at+28,true);
+  let data=bytes.subarray(start,start+f.size);
+  if(f.method===8){
+   const reader=new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw')).getReader();
+   const chunks=[];let size=0;
+   for(;;){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>12000000){await reader.cancel();throw Error('工作表过大')}chunks.push(value)}
+   data=await new Blob(chunks).arrayBuffer();
+  }else if(f.method!==0)throw Error('不支持此 XLSX 压缩方式');
+  const doc=new DOMParser().parseFromString(dec.decode(data),'application/xml');
+  if(doc.querySelector('parsererror'))throw Error('无法解析 XLSX 内容');return doc;
+ }
+ const book=await xml('xl/workbook.xml'),rels=await xml('xl/_rels/workbook.xml.rels');
+ const sheets=Array.from(book?.getElementsByTagName('sheet')||[]);
+ const relationships=Array.from(rels?.getElementsByTagName('Relationship')||[]);
+ const strings=await xml('xl/sharedStrings.xml');
+ const rich=node=>Array.from(node.getElementsByTagName('t'),v=>v.textContent).join('');
+ const shared=Array.from(strings?.getElementsByTagName('si')||[],rich);
+ const date1904=['1','true'].includes(book?.querySelector('workbookPr')?.getAttribute('date1904'));
+ async function readSheet(ref){
+  const relId=ref?.getAttribute('r:id');
+  const target=relationships.find(r=>r.getAttribute('Id')===relId)?.getAttribute('Target');
+  const path=target?new URL(target,'https://xlsx.invalid/xl/workbook.xml').pathname.slice(1):'xl/worksheets/sheet1.xml';
+  const sheet=await xml(path);
+  if(!sheet||(!target&&company))throw Error('找不到工作表 '+(ref?.getAttribute('name')||''));
+  return Array.from(sheet.getElementsByTagName('row'),row=>{
+  const values=[];
+  for(const c of row.getElementsByTagName('c')){
+   const letters=c.getAttribute('r')?.match(/^[A-Z]+/)?.[0];if(!letters)continue;
+   let col=0;for(const ch of letters)col=26*col+ch.charCodeAt(0)-64;
+   const t=c.getAttribute('t'),v=c.getElementsByTagName('v')[0]?.textContent??'';
+   if(t==='e'&&!company)throw Error('工作表包含 Excel 错误值');
+   values[col-1]=t==='e'?{error:v}:t==='s'?shared[Number(v)]:t==='inlineStr'?rich(c):v&&(!t||t==='n')?{serial:Number(v),date1904}:v;
+  }return values;
+ });
+ }
+ const names={balance:'合并资产负债表',income:'合并利润表',cashflow:'合并现金流量表'};
+ if(!company)return readSheet(sheets[0]);
+ if(company==='auto'&&!Object.values(names).some(name=>sheets.some(s=>s.getAttribute('name').includes(name))))return readSheet(sheets[0]);
+ const out={};
+ for(const [key,name] of Object.entries(names)){
+  const matches=sheets.filter(s=>s.getAttribute('name').includes(name));
+  if(matches.length!==1)throw Error('需要且只能有一张 '+name);
+  out[key]=await readSheet(matches[0]);
+ }
+ return out;
+}
+const str=v=>String(v?.serial??v??'').trim();
+function dateValue(v,length){
+ if(typeof v==='object'&&v&&Number.isFinite(v.serial)&&v.serial>=0&&v.serial<2958466){
+  const base=v.date1904?'1904-01-01':v.serial<60?'1899-12-31':'1899-12-30';
+  return new Date(Date.parse(base)+Math.floor(v.serial)*86400000).toISOString().slice(0,length);
+ }
+ const s=str(v).replaceAll('/','-');
+ const m=s.match(/^(\d{4})-(\d{1,2})(?:-(\d{1,2}))?$/);
+ return m&&Number(m[2])>=1&&Number(m[2])<=12&&(length===7||m[3])?[m[1],m[2].padStart(2,'0'),...(length===10?[m[3].padStart(2,'0')]:[])].join('-'):'';
+}
+function cents(v,negative=false){
+ const s=str(v);
+ if(!/^-?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d{1,2})?$/.test(s))throw Error('金额须为数字，最多两位小数');
+ const value=Math.round(Number(s.replaceAll(',',''))*100);
+ if(!Number.isSafeInteger(value)||Math.abs(value)>100000000000000||(!negative&&value<0))throw Error('金额超出允许范围');
+ return value;
+}
+async function parse(file,type){
+ if(file.size>5000000)throw Error('文件超过 5 MB');
+ if(type==='company'){
+  if(!/\.xlsx$/i.test(file.name))throw Error('公司合并报表需要 .xlsx 文件');
+  return companyRows(await xlsx(await file.arrayBuffer(),true));
+ }
+ const table=/\.xlsx$/i.test(file.name)?await xlsx(await file.arrayBuffer(),type==='report'?'auto':false):/\.csv$/i.test(file.name)?csv((await file.text()).replace(/^\uFEFF/,'')):null;
+ if(!table)throw Error('请选择 .xlsx 或 .csv 文件');
+ if(!Array.isArray(table))return companyRows(table);
+ const fields=specs[type].fields,head=Array.from(table[0]||[],str),indexes=fields.map(f=>head.indexOf(f));
+ if(indexes.includes(-1))throw Error('缺少列：'+fields.filter((_,i)=>indexes[i]<0).join('、'));
+ const seen=new Set(),out=[];
+ for(const [i,row] of table.slice(1).entries()){
+  if(!row.some(v=>str(v)))continue;
+  try{
+   const [a,b,c,d,e,f]=indexes.map(n=>row[n]);
+   const r=type==='ar'?{id:str(a),customer:str(b),issued:dateValue(c,10),due:dateValue(d,10),amount:cents(e),paid:cents(f)}:{id:dateValue(a,7),revenue:cents(b),cost:cents(c),expense:cents(d),cash:cents(e,true)};
+   const validDate=v=>v&&Number.isFinite(Date.parse(v))&&new Date(v).toISOString().slice(0,10)===v;
+   if(!r.id||r.id.length>120||seen.has(r.id))throw Error('编号或月份为空、过长或重复');
+   if(type==='ar'&&(!r.customer||r.customer.length>120||!validDate(r.issued)||!validDate(r.due)||r.due<r.issued||!r.amount||r.paid>r.amount))throw Error('请核对客户名称、日期和应收金额');
+   seen.add(r.id);out.push(r);
+  }catch(e){throw Error('第 '+(i+2)+' 行：'+e.message)}
+ }
+ if(!out.length||out.length>500)throw Error('请提供 1 至 500 行数据');
+ return out;
+}
+function companyRows(sheets){
+ const clean=v=>str(v).replace(/\s/g,'');
+ const starts=(value,name)=>clean(value).replace(/^(?:[一二三四五六七八九十]+、|[加减][：:])/,'').startsWith(name);
+ function amount(v){
+  if(v?.error)throw Error('Excel 单元格包含错误，请在 Excel 重算后保存');
+  if(!str(v))return null;
+  const n=typeof v==='object'?v.serial:Number(str(v).replaceAll(',',''));
+  const scaled=Math.round(Math.abs(n)*100)*Math.sign(n);
+  if(!Number.isSafeInteger(scaled)||Math.abs(scaled)>100000000000000)throw Error('报表数值无效');
+  return scaled;
+ }
+ function optional(v){try{return amount(v)}catch{return null}}
+ const close=sheets.income.find(row=>dateValue(row[0],10));
+ const period=close&&dateValue(close[0],7);
+ if(!period)throw Error('合并利润表缺少报表日期');
+ const [year,last]=period.split('-').map(Number);
+ if(year<2000||year>2099)throw Error('报表日期年份无效');
+ const headings=rows=>rows.find(row=>row.includes('1月')&&row.includes('12月'));
+ const cumulativeCol=row=>row.findIndex(v=>clean(v)==='本年累计');
+ const incomeMonths=headings(sheets.income),cashMonths=headings(sheets.cashflow);
+ const cumulative=!incomeMonths&&!cashMonths;
+ const incomeHead=incomeMonths||(cumulative&&sheets.income.find(row=>cumulativeCol(row)>0));
+ const cashHead=cashMonths||(cumulative&&sheets.cashflow.find(row=>cumulativeCol(row)>0));
+ if(!incomeHead||!cashHead)throw Error('利润表或现金流量表缺少匹配的月份列或本年累计列');
+ const balance=[];
+ const balanceHead=sheets.balance.findIndex(row=>clean(row[1])==='期末'&&clean(row[4])==='期末');
+ if(balanceHead<0)throw Error('找不到资产负债表的期末列');
+ for(const row of sheets.balance.slice(balanceHead+1)){
+  for(const c of [0,3]){
+   const name=str(row[c]),a=optional(row[c+1]),b=optional(row[c+2]);
+   if(name&&(a!==null||b!==null))balance.push([name,a,b]);
+  }
+ }
+ function required(rows,name,col){
+  const row=rows.find(r=>starts(r[0],name));
+  const value=row&&amount(row[col]);
+  if(value==null)throw Error('第 '+(col)+' 月对应列的 '+name+' 为空');
+  return value;
+ }
+ const detail=(rows,header,col)=>rows.slice(rows.indexOf(header)+1).flatMap(r=>{
+  const name=str(r[0]),a=cumulative?null:optional(r[col]),b=optional(r[cumulativeCol(header)]);
+  return name&&(a!==null||b!==null)?[[name,a,b]]:[];
+ });
+ return Array.from({length:cumulative?1:last},(_,i)=>{
+  const m=cumulative?last:i+1,inc=cumulative?cumulativeCol(incomeHead):incomeHead.indexOf(m+'月'),cash=cumulative?cumulativeCol(cashHead):cashHead.indexOf(m+'月');
+  if(inc<1||cash<1)throw Error('找不到 '+m+' 月列');
+  const expense=sum(['销售费用','管理费用','财务费用','研发费用'],name=>{
+   const row=sheets.income.find(r=>starts(r[0],name));
+   return row?amount(row[inc])??0:0;
+  });
+  return {id:year+'-'+String(m).padStart(2,'0'),cumulative,
+   revenue:required(sheets.income,'营业收入',inc),cost:required(sheets.income,'营业成本',inc),expense,
+   operating:required(sheets.income,'营业利润',inc),cash:required(sheets.cashflow,'经营活动产生的现金流量净额',cash),
+   company:{balance:m===last?balance:[],income:detail(sheets.income,incomeHead,inc),cashflow:detail(sheets.cashflow,cashHead,cash)}};
+ });
+}
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.tab){tab=b.dataset.tab;notify('');render();document.querySelector('[data-tab="'+tab+'"]')?.focus();return}
+ if(b.dataset.period){period=b.dataset.period;render();document.querySelector('[data-period="'+period+'"]')?.focus();return}
+ try{
+  if(b.id==='template'){
+   const s=specs[kind],url=URL.createObjectURL(new Blob(['\uFEFF'+s.fields.join(',')+'\r\n'+s.sample.join(',')+'\r\n'],{type:'text/csv;charset=utf-8'}));
+   const a=document.createElement('a');a.href=url;a.download=s.title+'模板.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+  if(b.id==='commit'){b.disabled=true;const result=await api('import',{type:kind==='company'?'report':kind,rows:pending});pending=null;await refresh();notify('已导入 '+result.count+(kind==='company'?' 个月。':' 行。'))}
+  if(b.dataset.payment){
+   const row=state.ar.find(r=>r.id===b.dataset.payment);
+   const value=prompt('登记回款 · '+row.id+' · 当前余额 '+yuan(balance(row))+'。输入人民币金额（元）');
+   if(value===null)return;
+   b.disabled=true;await api('payment',{id:row.id,amount:cents(value)});await refresh();notify('回款已登记。');
+  }
+ }catch(error){notify(error.message,true)}finally{b.disabled=false}
+});
+document.addEventListener('change',async e=>{
+ const el=e.target;
+ if(el.id==='periodYear'){period=el.value+period.slice(4);render();$('#periodYear').focus()}
+ if(el.id==='statement'){statement=el.value;render()}
+ if(el.id==='filter'){filter=el.value;render()}
+ if(el.id==='kind'){kind=el.value;pending=null;notify('');render()}
+ if(el.id==='file'&&el.files[0]){
+  const type=kind;pending=null;notify('正在读取文件…');
+  try{const rows=await parse(el.files[0],type);if(kind===type){pending=rows;notify('请核对预览后确认导入。')}}
+  catch(error){notify(error.message,true)}
+  render();
+ }
+});
+document.addEventListener('input',e=>{if(e.target.id==='query'){const pos=e.target.selectionStart;query=e.target.value;render();const field=$('#query');field.focus();field.setSelectionRange(pos,pos)}});
+document.addEventListener('submit',async e=>{
+ if(e.target.id!=='member')return;e.preventDefault();
+ const b=e.target.querySelector('button');b.disabled=true;
+ try{await api('members',Object.fromEntries(new FormData(e.target)));await refresh();notify('成员权限已更新。')}
+ catch(error){notify(error.message,true)}finally{b.disabled=false}
+});
+refresh().catch(error=>{$('#view').innerHTML=title('财务管理工作台',esc(error.message))+'<a href="/signin-with-chatgpt" target="_top">使用 ChatGPT 登录</a>'});
+let polling=false;
+setInterval(async ()=>{
+ if(polling||!state||document.hidden||!['dashboard','ar','revenue'].includes(tab))return;
+ polling=true;
+ const before=state;
+ try{
+  const next=await api('state');
+  if(state===before&&['dashboard','ar','revenue'].includes(tab)&&JSON.stringify(next)!==JSON.stringify(before)){
+   state=next;
+   const queryFocused=document.activeElement?.id==='query';
+   const pos=queryFocused?document.activeElement.selectionStart:0;
+   render();
+   if(queryFocused&&$('#query')){$('#query').focus();$('#query').setSelectionRange(pos,pos)}
+  }
+ }catch(error){notify(error.message,true)}
+ finally{polling=false}
+},15000);
+</script></html>

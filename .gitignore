@@ -1,0 +1,5 @@
+/dist/
+/finance.sqlite*
+/monthly-template.xlsx
+/.openai/
+/.env
