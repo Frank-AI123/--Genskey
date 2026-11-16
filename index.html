@@ -1,0 +1,1491 @@
+<!doctype html><html lang="zh-CN" data-account-mode="demo"><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1"><title>财务管理工作台 v2 · 演示</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6fa;color:#17263b;font:15px system-ui,sans-serif}header{background:#10263a;color:white;padding:20px 5vw;display:flex;justify-content:space-between;align-items:center;gap:12px}header strong{font-size:20px}header a{color:#b8d7e4}nav{display:flex;gap:8px;flex-wrap:wrap;padding:16px 5vw;background:white;border-bottom:1px solid #dce5eb}main{max-width:1500px;margin:auto;padding:32px 5vw}h1{margin:0 0 8px;font-size:32px}h2{margin-top:0;font-size:20px}p{line-height:1.65}.muted,small{color:#526478}.cards,.panels{display:grid;gap:15px;margin:24px 0;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}.panels{grid-template-columns:repeat(auto-fit,minmax(min(100%,370px),1fr))}.card,.panel{background:white;border:1px solid #dce5eb;border-radius:14px;padding:20px}.card strong{display:block;font-size:25px;margin:9px 0;overflow-wrap:anywhere}button,input,select{font:inherit;padding:9px 12px;border:1px solid #b8c9d6;border-radius:8px;background:white;color:inherit}button{cursor:pointer}button.active,button.primary{background:#076c67;color:white;border-color:#076c67}button:disabled{opacity:.55;cursor:wait}form,.tools{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:16px 0}label{display:grid;gap:5px}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;white-space:nowrap}th,td{padding:12px;text-align:left;border-bottom:1px solid #e0e8ed}th{background:#f4f7fa}.late{color:#9c3829}.bar{height:10px;background:#e9eff3;border-radius:8px;overflow:hidden;margin:6px 0 12px}.fill{height:100%;background:#148981}.line{display:flex;justify-content:space-between;gap:8px}.empty{padding:16px 0;color:#526478}#notice{margin:0;white-space:pre-wrap}#notice:empty{display:none}.error{color:#9c3829}.ok{color:#076c67}@media(max-width:540px){header{align-items:flex-start;flex-direction:column}main{padding-top:22px}}
+body{--rail:#142536;--surface:#f5f7fb;--accent:#08796c;--stroke:#e0e7ee;background:var(--surface);font-family:"DM Sans","Microsoft YaHei",system-ui,sans-serif}
+.workspace{display:grid;grid-template-columns:228px minmax(0,1fr);min-height:100dvh}
+.sidebar{background:var(--rail);color:white;padding:25px 16px;position:sticky;top:0;height:100dvh;overflow:auto}
+.brand{display:flex;align-items:center;gap:11px;margin:0 3px 30px;font-size:16px;white-space:nowrap}
+.brand-mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:#126d64;color:#e2fff7;font-weight:700}
+.workspace nav{display:grid;gap:6px;padding:0;background:none;border:0}
+nav button{color:#ced9e4;background:transparent;border-color:transparent;text-align:left;padding:11px 13px;white-space:nowrap}
+nav button:hover{background:#203a4d;color:white}
+nav button.active{background:#23483f;border-color:#3a6b60;color:#eafff8}
+.content{min-width:0}
+header{min-height:68px;background:white;color:#17263b;border-bottom:1px solid var(--stroke);padding:12px clamp(16px,3vw,44px);font-size:14px}
+header strong{font-size:15px}header a{color:var(--accent)}#identity{overflow-wrap:anywhere;text-align:right}
+.account-actions{display:inline-flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:6px 12px}.account-actions form{display:inline;margin:0}.account-actions button{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline}
+main{padding:30px clamp(16px,3vw,44px);max-width:1500px}
+h1{letter-spacing:-.02em}h2{letter-spacing:-.01em}
+.card,.panel{border-color:var(--stroke);box-shadow:0 2px 8px #12324908}
+.card{padding:18px 20px;border-top:3px solid #8cc1b2}
+.card strong,td,.line b{font-variant-numeric:tabular-nums}
+.period-control{margin:0 0 24px;gap:18px;padding:12px 16px}
+.period-control .tools{margin:0;gap:5px}
+.period-control button{min-width:46px;padding:7px 9px}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #68a9cb;outline-offset:2px}
+tbody tr:hover{background:#f5f9fa}
+.erp-panel{margin:20px 0}.erp-panel a{color:var(--accent)}.erp-review{border-left:4px solid #bf8c38;padding:10px 13px;background:#fff9ef;color:#5f481d}.erp-review p{margin:4px 0}.erp-more{margin-top:12px}.erp-link{color:var(--accent);text-decoration:underline}.erp-search{margin:12px 0}.erp-search input{min-width:min(230px,100%)}
+.wecom-dialog{width:min(680px,calc(100% - 24px));max-height:calc(100dvh - 36px);padding:22px;border:1px solid var(--stroke);border-radius:14px;color:inherit;overflow:auto}
+.wecom-dialog::backdrop{background:#14253699}.wecom-dialog .scroll{max-height:40dvh}.wecom-dialog th:first-child,.wecom-dialog td:first-child{white-space:normal;overflow-wrap:anywhere}
+.wecom-dialog form{display:grid;gap:12px}.wecom-dialog .tools{margin:4px 0}.wecom-dialog p{margin:8px 0}
+.wecom-select-cell{width:38px;text-align:center}.wecom-select-cell input{vertical-align:middle;width:17px;height:17px;margin:0;accent-color:var(--accent);cursor:pointer}.wecom-select-cell input:disabled{cursor:default}#wecom-preview td:nth-child(2){white-space:normal;overflow-wrap:anywhere}#wecom-preview .wecom-customer-name{display:block;cursor:pointer}#wecom-preview tr:has([data-wecom-customer]:checked){background:#ebf7f3}
+.followup-dialog{width:min(870px,calc(100% - 24px))}
+.followup-dialog label{min-width:0}.followup-dialog input{max-width:100%}
+.followup-dialog textarea{width:100%;min-height:100px;padding:10px;border:1px solid #b8c9d6;border-radius:8px;font:inherit;resize:vertical}
+.followup-dialog .scroll{max-height:48dvh}.followup-dialog .scroll th{position:sticky;top:0}
+.followup-notes{list-style:none;padding:0}.followup-notes li{padding:10px 0;border-top:1px solid var(--stroke)}
+.followup-notes p{white-space:pre-wrap;overflow-wrap:anywhere}
+.ar-metric{position:relative}.ar-metric:has(.ar-metric-tip:not([hidden])){z-index:3}.ar-metric-label{display:flex;align-items:center;justify-content:space-between;gap:6px}.ar-metric-help{flex:none;display:grid;place-items:center;width:22px;height:22px;padding:0;border-radius:50%;font-size:12px;font-weight:700;color:#166b63;border-color:#a5c7c2;background:#eef8f6}.ar-metric-help:hover,.ar-metric-help[aria-expanded="true"]{background:#d8eeea;border-color:#75a6a0}.ar-metric-tip{position:absolute;inset-inline:0;top:calc(100% - 2px);padding:13px 15px;border:1px solid #d9e7e5;border-radius:12px;background:#fff;box-shadow:0 8px 24px #10263a26;color:#294255;font-size:13px;line-height:1.6;overflow-wrap:anywhere}.ar-metric-tip b{color:#126a60}.ar-metric-tip p{margin:5px 0 0}.ar-metric-tip p:last-child:not(:first-of-type){border-top:1px solid #e0ebe9;padding-top:6px}
+.skills-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.skills-head p{margin:0 0 12px}.skills-head button{flex:none}
+.skills-filters,.skills-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:end}
+.skills-filters{grid-template-columns:minmax(0,2fr) minmax(0,1fr) auto;margin:12px 0 20px}
+.skills-form{margin:0}.skills-form .wide{grid-column:1/-1}
+.skills-form input,.skills-form textarea,.skills-filters input,.skills-filters select{width:100%;min-width:0}
+.skills-form textarea{font:inherit;color:inherit;min-height:110px;resize:vertical;padding:9px 12px;border:1px solid #b8c9d6;border-radius:8px}
+.skills-form textarea:focus-visible{outline:3px solid #68a9cb;outline-offset:2px}
+.skill-grid{display:grid;gap:15px;grid-template-columns:repeat(auto-fit,minmax(min(100%,255px),1fr))}
+.skill-card{display:flex;flex-direction:column;min-width:0}
+.skill-card h2{margin:10px 0 0}.skill-card p{margin:8px 0 14px}
+.skill-card h2,.skill-card p,.skill-card small,.skill-detail{overflow-wrap:anywhere}
+.skill-card button{margin-top:14px;align-self:start}
+.skill-labels{display:flex;gap:6px;flex-wrap:wrap;color:#15594d;font-size:13px}
+.skill-labels span{padding:3px 8px;border-radius:6px;background:#e8f4ef;overflow-wrap:anywhere}
+.skill-labels .unpublished{color:#794517;background:#fff2da}
+.skill-detail{max-width:900px;margin-top:16px}.skill-instructions{white-space:pre-wrap;line-height:1.65}
+.skill-actions a{padding:9px 12px;border:1px solid #b8c9d6;border-radius:8px;color:var(--accent);text-decoration:none}
+.skill-actions a:hover{text-decoration:underline}
+@media(max-width:640px){.skills-filters,.skills-form{grid-template-columns:1fr}}
+@media(max-width:900px){
+ .workspace{grid-template-columns:minmax(0,1fr)}.sidebar{position:static;height:auto;padding:12px 16px}.brand{margin:0 0 10px}
+ .workspace nav{display:flex;flex-wrap:nowrap;overflow:auto}.workspace nav button{flex:none}
+}
+@media(max-width:540px){header{flex-direction:row;align-items:center}header strong{flex:none}main{padding-top:16px}.cards{grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}.card{padding:12px}.card strong{font-size:20px}}
+.bi-dashboard{--bi-ink:#14273b;--bi-muted:#556a7d;--bi-rule:#e2eaf0;--bi-teal:#08776c;--bi-amber:#a24d25;color:var(--bi-ink);font-variant-numeric:tabular-nums}
+.bi-hero{position:relative;isolation:isolate;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;overflow:hidden;padding:30px 34px;border-radius:20px;color:#f0fbfb;background:radial-gradient(ellipse at 90% 30%,#1b5158 0%,transparent 60%),linear-gradient(115deg,#132438,#172f44);box-shadow:0 12px 30px #192d4420}
+.bi-hero:before{content:"";position:absolute;inset:0 0 0 39%;z-index:-1;pointer-events:none;background:repeating-linear-gradient(90deg,#d2f3ed12 0 1px,transparent 1px 37px),repeating-linear-gradient(0deg,#d2f3ed12 0 1px,transparent 1px 37px);mask-image:linear-gradient(90deg,transparent,#000)}
+.bi-hero h1{font-size:clamp(31px,4vw,48px);letter-spacing:-.035em;line-height:1.15;margin:0 0 8px;font-weight:750}
+.bi-hero p{margin:0;color:#c5d9e5}.bi-hero .bi-kicker{color:#8ee4d0;font-size:13px;font-weight:650;letter-spacing:.17em;margin-bottom:10px}
+.bi-dates{display:flex;gap:10px;flex-wrap:wrap}.bi-dates div{border:1px solid #92c6ca50;border-radius:10px;background:#0b2a36a6;padding:10px 14px;min-width:127px}.bi-dates span,.bi-dates b{display:block}.bi-dates span{color:#b5ceda;font-size:12px}.bi-dates b{font-size:15px;margin-top:4px}
+.bi-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:16px 0}.bi-metric{container-type:inline-size;min-width:0;padding:17px 15px;border:1px solid var(--bi-rule);border-radius:14px;background:#fff;box-shadow:0 3px 14px #18365408}.bi-metric span{display:block;font-size:13px;color:var(--bi-muted);font-weight:650}.bi-metric strong{display:block;font-size:min(24px,10.7cqi);line-height:1.3;margin:8px 0 6px;letter-spacing:-.025em;white-space:nowrap}.bi-metric small{color:var(--bi-muted);font-size:12px;line-height:1.5}.bi-metric small b{color:var(--bi-ink)}.bi-metric-risk{background:#fff6ed;border-color:#efd9c4}.bi-metric-risk span,.bi-metric-risk strong{color:#903e21}
+.bi-charts{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px}.bi-panel{min-width:0;background:#fff;border:1px solid var(--bi-rule);border-radius:16px;padding:22px;box-shadow:0 5px 18px #1836540a}.bi-panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.bi-panel-head h2{font-size:19px;margin:0}.bi-panel-head p{margin:4px 0 0;color:var(--bi-muted);font-size:13px}.bi-text-button{color:var(--bi-teal);border-color:#cbe1dc;background:#f4fbf8;padding:7px 10px;font-size:13px;font-weight:650}
+.bi-chart{position:relative;height:179px;margin:25px 0 28px;padding-left:45px}.bi-guides,.bi-bars{position:absolute;inset:0 1px 0 45px}.bi-guide{position:absolute;inset-inline:0;top:var(--level);border-top:1px dashed #dbe6ee}.bi-guide:last-child{border-top-style:solid}.bi-guide span{position:absolute;right:100%;padding-right:9px;transform:translateY(-50%);font-size:11px;color:#607589}.bi-bars{display:flex;align-items:stretch;gap:3px}.bi-month{position:relative;flex:1;min-width:0;padding:0;background:transparent;border:0;border-radius:7px}.bi-month:hover,.bi-month[aria-pressed="true"]{background:#e6f5f365}.bi-column{position:absolute;top:var(--start);height:var(--size);min-height:1px;width:min(64%,32px);left:50%;transform:translateX(-50%);border-radius:5px 5px 0 0;background:linear-gradient(#73c6b8,#25887c);opacity:.80}.bi-month.negative .bi-column{background:linear-gradient(#ddad59,#d27c47);border-radius:0 0 5px 5px}.bi-month[aria-pressed="true"] .bi-column,.bi-month:hover .bi-column,.bi-month:focus-visible .bi-column{opacity:1}.bi-month[aria-pressed="true"]:not(.negative) .bi-column{background:linear-gradient(#32bda7,#0c6c64);box-shadow:0 -3px 12px #218d7b36}.bi-month-label{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;color:#587082}.bi-month[aria-pressed="true"] .bi-month-label{color:#086654;font-weight:750}
+.bi-aging{display:grid;grid-template-columns:minmax(126px,.85fr) minmax(132px,1fr);gap:18px;align-items:center;margin-top:26px}.bi-donut{width:min(100%,175px);aspect-ratio:1;display:grid;place-items:center;margin:auto;border-radius:50%;background:var(--segments);position:relative}.bi-donut>div{width:74%;aspect-ratio:1;border-radius:50%;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;white-space:nowrap}.bi-donut small{font-size:11px;color:var(--bi-muted)}.bi-donut strong{font-size:clamp(13px,1.4vw,20px);letter-spacing:-.03em}.bi-legend{list-style:none;margin:0;padding:0;display:grid;gap:13px}.bi-legend li{display:grid;grid-template-columns:9px 1fr auto;gap:7px;align-items:center;font-size:12px;color:var(--bi-muted)}.bi-legend i{width:8px;height:8px;border-radius:3px;background:var(--swatch)}.bi-legend b{white-space:nowrap;color:#243c50}
+.bi-risk,.bi-report,.bi-monthly{margin-top:16px}.bi-switch{display:flex;gap:3px;padding:3px;background:#eef3f7;border:1px solid #e6edf2;border-radius:10px}.bi-switch button{border:0;background:transparent;padding:6px 10px;color:#4b6579;font-size:13px}.bi-switch button[aria-pressed="true"]{background:white;color:var(--bi-ink);font-weight:650;box-shadow:0 1px 4px #1c34401b}.bi-risk-grid{display:grid;grid-template-columns:minmax(230px,.72fr) minmax(0,1.4fr);gap:22px;margin:18px 0}.bi-risk-insight{background:#fff7f0;border:1px solid #f4e5d7;border-radius:12px;padding:16px 18px}.bi-risk-insight small{display:block;color:#8a4b2a;font-weight:650}.bi-risk-insight>strong{display:block;font-size:clamp(21px,2.1vw,32px);color:#8a3a21;margin:6px 0 13px;letter-spacing:-.027em;overflow-wrap:anywhere}.bi-risk-insight dl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0}.bi-risk-insight dt{font-size:12px;color:#76563d}.bi-risk-insight dd{font-size:17px;font-weight:750;margin:2px 0 0}.bi-risk-insight p{margin:12px 0 0;font-size:12px;color:#76563d}
+.bi-ranking{display:grid;gap:10px;align-content:center;list-style:none;margin:0;padding:0}.bi-ranking li{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:8px;align-items:center}.bi-rank-number{color:#708293;font-size:12px}.bi-ranking a,.bi-all a{color:#166860;text-underline-offset:3px;overflow-wrap:anywhere}.bi-ranking strong{font-size:14px;white-space:nowrap}.bi-rank-track{height:6px;background:#f1eee9;border-radius:6px;margin-top:4px}.bi-rank-track span{display:block;height:100%;min-width:2px;border-radius:inherit;background:linear-gradient(90deg,#e8b270,#cb684c)}
+.bi-all summary,.bi-monthly summary{cursor:pointer;color:var(--bi-teal);font-weight:650;padding:7px 0}.bi-all .scroll{margin-top:10px}.bi-report-metrics{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:0}.bi-report .bi-metric{background:#f7fafb}.bi-monthly{padding:9px 17px;border:1px solid var(--bi-rule);border-radius:12px;background:#fff}.bi-monthly .erp-panel{border:0;box-shadow:none;padding:10px 0;margin:0}
+@media(max-width:1240px){.bi-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.bi-aging{grid-template-columns:1fr;gap:12px;margin-top:12px}.bi-donut{width:min(100%,132px)}.bi-legend{gap:5px}.bi-chart{height:201px}.bi-report-metrics{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:740px){.bi-charts,.bi-risk-grid{grid-template-columns:1fr}.bi-hero{padding:23px;align-items:flex-start;flex-direction:column;gap:14px}.bi-metrics,.bi-report-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.bi-metric-risk{grid-column:1/-1}.bi-aging{grid-template-columns:minmax(90px,1fr) minmax(138px,1.1fr);margin-top:20px}.bi-legend{gap:8px}.bi-chart{height:158px}.bi-panel{padding:16px}.bi-risk-grid{gap:16px}.bi-ranking li{grid-template-columns:20px minmax(0,1fr) auto;gap:6px}}
+@media(max-width:370px){.bi-aging{grid-template-columns:1fr}.bi-rank-number{display:none}.bi-ranking li{grid-template-columns:minmax(0,1fr) auto}}
+.bi-assistant{margin:0 0 20px;border-top:3px solid #70b6a6}
+.bi-assistant .bi-ai-kicker{color:var(--accent);font-size:12px;font-weight:700;margin:0 0 4px}
+.bi-request{display:grid;gap:8px;margin:16px 0 10px}
+.bi-request>label{font-weight:650}
+.bi-request textarea{width:100%;resize:vertical;min-height:64px;padding:9px 12px;border:1px solid #aabfce;border-radius:8px;font:inherit;color:inherit}
+.bi-request textarea:focus-visible{outline:3px solid #68a9cb;outline-offset:2px}
+.bi-ai-actions{display:flex;align-items:end;flex-wrap:wrap;gap:8px}
+.bi-ai-actions label,.bi-model-box label{font-size:13px;color:#425a6e;min-width:0}
+.bi-ai-actions select,.bi-model-box select{max-width:min(100%,285px)}
+.bi-voice[aria-pressed="true"]{border-color:#b6654b;background:#fff2e9;color:#8c361e}
+.bi-voice:disabled{cursor:default}
+#bi-request-status,#bi-voice-status{margin:0}
+#bi-request-status:empty,#bi-voice-status:empty{display:none}
+.bi-ai-examples{display:flex;gap:6px 8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.bi-ai-examples button{background:#f5faf9;color:#165f58;border-color:#d5e8e4;font-size:13px;padding:5px 9px}
+#bi-results:not(:empty){margin-top:14px;padding-top:14px;border-top:1px solid var(--stroke)}
+.bi-results-head{display:flex;align-items:baseline;gap:5px 12px;flex-wrap:wrap}
+.bi-results-head h3,.bi-series h3{margin:0;font-size:16px}
+.bi-ai-cards,.bi-series-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px;margin-top:10px}
+.bi-series-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));margin-bottom:8px}
+.bi-series{border:1px solid var(--stroke);background:#f8fbfc;border-radius:10px;padding:12px;min-width:0}
+.bi-ai-chart{display:grid;gap:6px;padding:0;margin:10px 0;list-style:none}
+.bi-ai-chart li{display:grid;grid-template-columns:3.7rem minmax(8px,1fr) auto;align-items:center;gap:7px;font-size:12px;font-variant-numeric:tabular-nums}
+.bi-ai-track{height:10px;border-radius:3px;background:#e7eef1;position:relative}
+.bi-ai-track::after{content:"";position:absolute;left:min(calc(100% - 1px),var(--zero));top:0;bottom:0;border-left:1px solid #526e80}
+.bi-ai-track i{position:absolute;inset:1px auto 1px var(--offset);width:var(--width);border-radius:2px;background:#08796c}
+.bi-ai-track i.negative{background:#b05a3d}
+.bi-model-box{margin:16px 0;overflow-wrap:anywhere}
+
+.budget-toolbar{margin:18px 0;align-items:end;gap:10px;padding:14px 18px}
+.budget-toolbar input{width:8rem}
+.budget-section{margin:16px 0}
+.budget-section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.budget-section-head h2,.budget-section-head p,.budget-section-head .tools{margin:0}
+.budget-section-head p{color:#526478;margin-top:5px}
+.budget-metrics{margin:16px 0}
+.budget-badge{display:inline-block;border-radius:20px;padding:4px 10px;background:#edf1f5;color:#46586b;white-space:nowrap;font-size:13px;font-weight:600}
+.budget-submitted{background:#e7efff;color:#254888}.budget-returned{background:#fff0dc;color:#794517}.budget-approved{background:#e4f4ec;color:#12664a}
+.budget-return-note{white-space:pre-wrap;overflow-wrap:anywhere;background:#fff7e9;border-left:4px solid #c78939;padding:10px 14px;color:#6a4113}
+#budget-editor,#budget-review{display:grid;align-items:start;margin:12px 0 0}
+#budget-editor .tools,#budget-review .tools{margin:4px 0 0}
+.budget-editor-table td{padding:8px 6px}
+.budget-editor-table input{width:100%;min-width:9rem}.budget-editor-table input[name=note]{min-width:11rem}
+.budget-editor-table select{min-width:5.5rem}
+#budget-review textarea{font:inherit;color:inherit;padding:9px 12px;border:1px solid #b8c9d6;border-radius:8px;resize:vertical;width:100%}
+.budget-events{list-style:none;margin:0;padding:0}
+.budget-events li{padding:10px 0;border-top:1px solid var(--stroke);overflow-wrap:anywhere}
+.budget-events small{margin-left:12px}.budget-events p{margin:4px 0 0;white-space:pre-wrap}
+.budget-section td:nth-child(4){white-space:normal;overflow-wrap:anywhere;min-width:9rem}
+
+</style>
+<div class="workspace"><aside class="sidebar"><div class="brand"><span class="brand-mark" aria-hidden="true">财</span><strong>财务管理工作台</strong></div><nav id="nav" aria-label="工作台导航"></nav></aside><div class="content"><header><strong id="page-title">财务工作台</strong><span id="identity"></span></header><main><p id="notice" role="status"></p><section id="view"><p>正在连接财务工作台…</p></section></main></div></div>
+<dialog id="wecom-dialog" class="wecom-dialog" aria-labelledby="wecom-heading">
+ <h2 id="wecom-heading">发送超 180 天逾期明细</h2>
+ <p id="wecom-status" role="status" aria-live="polite"></p>
+ <form id="wecom-form">
+  <label>企业微信群<select name="groupId" id="wecom-group" required></select></label>
+  <div id="wecom-preview"></div>
+  <div class="tools"><button id="wecom-send" type="submit" class="primary" disabled>确认发送</button><button id="wecom-view-dispatch" type="button" hidden>查看跟进</button><button id="wecom-close" type="button">关闭</button></div>
+ </form>
+</dialog>
+<dialog id="followup-dialog" class="wecom-dialog followup-dialog" aria-labelledby="followup-heading">
+ <div class="line"><h2 id="followup-heading" tabindex="-1">企业微信推送与跟进</h2><button id="followup-close" type="button">关闭</button></div>
+ <p id="followup-status" role="status" aria-live="polite"></p>
+ <div id="followup-view"></div>
+</dialog>
+<div id="demo-banner" hidden style="padding:10px 16px;background:#fef3cf;color:#653c0c;font-size:14px"><b>v2 · 只读演示</b>　页面仅使用虚构数据，可离线浏览。登录、财务写入、AI 和企业微信功能需要运行完整工作台。</div>
+<script>
+// Synthetic fixtures for the standalone HTML. No runtime data is read by the build.
+const demoReports=[730000,814000,768000,920000,1068000,995000].map((amount,i)=>{
+ const id='2026-'+String(i+5).padStart(2,'0');
+ const revenue=amount*100,cost=Math.round(revenue*.62),expense=Math.round(revenue*.16);
+ const cash=Math.round(revenue*.19),operating=revenue-cost-expense;
+ return {id,revenue,cost,expense,cash,operating,company:{
+  balance:[['货币资金',160000000+i*12000000,148000000],['应收账款',89000000+i*4000000,64000000],['资产总计',760000000+i*27000000,733000000],['负债和所有者权益总计',760000000+i*27000000,733000000]],
+  income:[['营业收入',revenue,null],['营业成本',cost,null],['营业利润',operating,null]],
+  cashflow:[['经营活动产生的现金流量净额',cash,null]]
+ }};
+});
+const demoMonths=demoReports.map(({id,revenue})=>({id,net:revenue,gross:Math.round(revenue*1.13),lines:2,other:0,missing:0}));
+const demoCustomers=[
+ ['示例客户 A',24000000,6000000,5000000,3000000,2000000,6500000,0],
+ ['示例客户 B',15000000,2500000,2500000,2000000,3000000,4500000,0],
+ ['示例客户 C',11300000,7000000,6200000,1800000,700000,1800000,0],
+ ['示例客户 D', 8400000,4000000,6000000,2000000,1200000,0,400000],
+].map(([customer,book,paid,current,days_1_90,days_91_180,verified_days_181_plus,unknown])=>{
+ const estimated=current+days_1_90+days_91_180+verified_days_181_plus+unknown;
+ return {customer,book,paid,current,days_1_90,days_91_180,days_181_plus:book-current-days_1_90-days_91_180,verified_days_181_plus,unknown,estimated,difference:book-estimated,term:60};
+});
+const demoSum=key=>demoCustomers.reduce((total,row)=>total+row[key],0);
+const demoUpdated='2026-10-31T04:00:00Z',demoYear=2026;
+const demoItems=[{subject:'软件订阅',month:3,amount:2400000,note:'演示项目'},{subject:'设备更新',month:9,amount:3600000,note:'演示项目'}];
+const demoBudget={department:'示例运营部',year:demoYear,status:'approved',total:6000000,updated_at:demoUpdated,items:demoItems,
+ events:[{action:'submit',at:'2026-10-30T04:00:00Z',email:'填报员（示例）'},{action:'approve',at:demoUpdated,email:'财务人员（示例）',note:'已复核预算明细。'}]};
+const demoSkills=[
+ {id:'reconcile',name:'月末应收核对',category:'月结',summary:'核对期末应收、订单余额与已分配回款。',instructions:'1. 对齐报表截止日。\n2. 核对总账与客户明细。\n3. 标记余额和账期差异，留待复核。'},
+ {id:'budget',name:'部门预算检查',category:'预算',summary:'复核预算的科目、月份和填报说明。',instructions:'1. 按科目和月份汇总明细。\n2. 检查是否漏填或重复。\n3. 对重大金额变动补充说明。'},
+].map(skill=>({...skill,published:1,owner:'财务团队（示例）',version:'1.0',updated_at:demoUpdated}));
+const demoState={email:'示例访客',role:'viewer',wecom:false,members:[],ar:[],report:demoReports,erp:{
+ months:demoMonths,
+ snapshot:{as_of:'2026-10-31',period_start:'2026-01-01',book_customers:demoCustomers.length,book:demoSum('book'),paid:demoSum('paid'),
+  estimated:demoSum('estimated'),missing_terms:demoSum('unknown'),difference:demoSum('difference')},
+ aging:{current:demoSum('current'),short:demoSum('days_1_90'),middle:demoSum('days_91_180'),long:demoSum('verified_days_181_plus'),
+  unknown:demoSum('unknown'),needs_review:demoCustomers.filter(row=>row.days_181_plus<0).length},
+ exposure:demoCustomers.map(row=>({customer:row.customer,book:row.book,residual:row.days_181_plus,verified:row.verified_days_181_plus}))
+}};
+
+function demoApi(path,data){
+ if(data!==undefined)throw Error('演示页面为只读。');
+ const url=new URL(path,'https://demo.invalid/');
+ const get=key=>url.searchParams.get(key)||'';
+ const q=get('q').trim().toLowerCase();
+ const matches=(...fields)=>fields.some(field=>String(field).toLowerCase().includes(q));
+ const rowsPage=rows=>({rows,page:1,next:false});
+ switch(url.pathname){
+  case '/state': return demoState;
+  case '/erp/customers': return rowsPage(demoCustomers.filter(row=>matches(row.customer)));
+  case '/erp/orders': {
+   const customer=demoCustomers.find(row=>row.customer===get('customer'));
+   const n=demoCustomers.indexOf(customer)+1;
+   const buckets=[['current','2026-09-13','2026-11-12',0],['days_1_90','2026-07-17','2026-09-15',46],
+    ['days_91_180','2026-04-13','2026-06-12',141],['verified_days_181_plus','2026-02-08','2026-04-09',205],
+    ['unknown','2026-10-15',null,null]];
+   const orders=customer?buckets.flatMap(([bucket,first_day,first_due,max_days],i)=>{
+    const order_no='DEMO-SO-'+n+'-'+(i+1),document='DEMO-AR-'+n+'-'+(i+1);
+    const estimated=customer[bucket],paid=i===0?customer.paid:0;
+    return estimated&&matches(order_no,document)?[{order_no,document,org:'示例主体',first_day,first_due,max_days,unknown:!first_due,
+     order_total:estimated+paid,invoiced:estimated+paid,paid,estimated}]:[];
+   }):[];
+   return {...rowsPage(orders),customer};
+  }
+  case '/erp/revenue': {
+   const month=demoMonths.find(row=>row.id===get('month'));
+   const rows=month?[0,1].map(i=>({order_no:'DEMO-REV-'+month.id+'-'+(i+1),date:month.id+'-'+(10+i*10),kind:i?'服务收入':'产品收入',
+    customer:demoCustomers[i].customer,net:month.net*(i?.4:.6),gross:month.gross*(i?.4:.6),invoice:'DEMO-INV-'+(i+1)})):[];
+   const filtered=rows.filter(row=>matches(row.customer,row.order_no));
+   return {...rowsPage(filtered),kinds:filtered.map(row=>({...row,lines:1}))};
+  }
+  case '/budgets': return {department:demoBudget.department,fill:false,review:false,departments:[demoBudget.department],
+   rows:Number(get('year'))===demoYear?[demoBudget]:[]};
+  case '/budgets/detail':
+   if(Number(get('year'))===demoYear&&get('department')===demoBudget.department)return {budget:demoBudget};
+   break;
+  case '/skills': return {skills:demoSkills};
+ }
+ const skill=demoSkills.find(skill=>url.pathname==='/skills/'+skill.id);
+ if(skill)return {skill};
+ throw Error('演示中没有这项数据。');
+}
+
+const $=s=>document.querySelector(s);
+const demoMode=document.documentElement.dataset.accountMode==='demo';
+if(demoMode)$('#demo-banner').hidden=false;
+const localAccounts=document.documentElement.dataset.accountMode==='local';
+const accountActions=localAccounts?'<span class="account-actions"><a href="/account/password">修改密码</a><form action="/signout-with-chatgpt" method="post"><button>退出</button></form></span>':'<a href="/signout-with-chatgpt" target="_top">退出</a>';
+const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=new Intl.NumberFormat('zh-CN',{style:'currency',currency:'CNY'});
+const yuan=v=>fmt.format(v/100);
+const pct=(n,d)=>d?(100*n/d).toFixed(1)+'%':'—';
+const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+const days=(a,b)=>Math.max(0,Math.round((Date.parse(a)-Date.parse(b))/86400000));
+const balance=r=>r.amount-r.paid;
+const sum=(a,f)=>a.reduce((s,v)=>s+f(v),0);
+const roleName={admin:'管理员',finance:'财务人员',viewer:'只读人员',budget:'预算填报员'};
+const specs={
+ ar:{title:'应收账款',fields:['单据编号','客户名称','开单日期','到期日期','应收金额','已收金额'],sample:['AR-001','示例客户','2026-11-01','2026-12-01',12000,3000]},
+ report:{title:'月度财务报表',fields:['月份','营业收入','营业成本','期间费用','经营现金流净额'],sample:['2026-11',100000,60000,20000,16000]}
+};
+let state,tab=location.hash==='#budgets'?'budgets':location.hash.startsWith('#ar')?'ar':location.hash==='#skills'?'skills':location.hash==='#ai-models'?'ai-models':localAccounts&&location.hash==='#members'?'members':'dashboard',period='',statement='balance',query='',filter='all',kind='ar',pending;
+let erpPage=1,erpQuery='',erpRouteKey='',erpLegacy=false;
+const selectedCustomer=()=>location.hash.startsWith('#ar?')?new URLSearchParams(location.hash.slice(4)).get('customer')||'':'';
+const periodTabs=['dashboard','statements','revenue','ar'];
+const statementTabs=[['balance','资产负债表'],['income','利润表'],['cashflow','现金流量表']];
+const currentPeriod=()=>today().slice(0,7);
+function periods(){
+ return [...new Set([...state.report.map(r=>r.id),...state.ar.map(r=>r.issued.slice(0,7)),...(state.erp?.months??[]).map(r=>r.id)])].sort();
+}
+function periodControl(){
+ const year=period.slice(0,4);
+ const years=[...new Set([currentPeriod(),period,...periods()].map(v=>v.slice(0,4)))].sort().reverse();
+ return '<div class="panel tools period-control" role="group" aria-label="数据期间"><label>年份<select id="periodYear">'+years.map(y=>'<option '+(y===year?'selected':'')+'>'+y+'</option>').join('')+'</select></label><div role="group" aria-label="月份" class="tools">'+Array.from({length:12},(_,i)=>{
+  const value=year+'-'+String(i+1).padStart(2,'0');
+  return '<button data-period="'+value+'" aria-pressed="'+(value===period)+'" class="'+(value===period?'active':'')+'">'+(i+1)+'月</button>';
+ }).join('')+'</div></div>';
+}
+const periodReceivables=()=>state.ar.filter(r=>r.issued.startsWith(period+'-'));
+const canWrite=()=>['admin','finance'].includes(state.role);
+const notify=(message,bad=false)=>{$('#notice').textContent=message;$('#notice').className=bad?'error':'ok'};
+async function api(path,data){
+ if(demoMode)return demoApi(path,data);
+ const r=await fetch('/api/'+path,data===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+ const body=await r.json();
+ if(localAccounts&&r.status===401)location.replace('/signin-with-chatgpt');
+ if(!r.ok)throw Error(body.error);
+ return body;
+}
+function applyState(next){
+ if(state&&(state.email!==next.email||next.role==='budget'&&state.role!=='budget'))biResetSession();
+ state=next;
+}
+async function refresh(){applyState(await api('state'));render()}
+const title=(heading,sub)=>'<h1>'+heading+'</h1><p class="muted">'+sub+'</p>';
+const card=(name,value,detail)=>'<div class="card"><small>'+name+'</small><strong>'+value+'</strong><small>'+detail+'</small></div>';
+const grid=(heads,rows)=>rows.length?'<div class="scroll"><table><thead><tr>'+heads.map(s=>'<th>'+s+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(s=>'<td>'+s+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>':'<p class="empty">暂无符合条件的数据</p>';
+const erpMoney=v=>v==null?'—':yuan(v);
+const knownGross=r=>r.gross==null?'—':yuan(r.gross)+(r.missing?'（部分）':'');
+function arMetric(id,label,value,detail,formula,explanation,example){
+ const tip='ar-metric-'+id;
+ return '<article class="card ar-metric"><div class="ar-metric-label"><small>'+esc(label)+'</small><button type="button" class="ar-metric-help" aria-label="'+esc(label+'的计算说明')+'" aria-controls="'+tip+'" aria-expanded="false">?</button></div>'+
+ '<strong>'+yuan(value)+'</strong><small>'+esc(detail)+'</small><div id="'+tip+'" class="ar-metric-tip" hidden><b>计算口径</b><p>'+esc(formula)+'</p><p>'+esc(explanation)+'</p>'+(example?'<p>'+esc(example)+'</p>':'')+'</div></article>';
+}
+function arMetricCards(s){
+ return '<div class="cards">'+
+ arMetric('book','账面期末余额',s.book,s.book_customers+' 个客户 · 来源：应收余额表','账面期末余额 = 各客户账面期末应收余额之和。','取《应收余额》'+s.as_of+'的期末快照。同一客户有多条记录时，先按客户汇总。')+
+ arMetric('paid','已分配回款',s.paid,s.period_start+' 至 '+s.as_of+' · 已分配到订单','已分配回款 = 统计期内已分配至各笔应收的回款金额之和。','依次按订单号、D 列指定月份分配。两者都未指定时，按实际收款月份，在同客户、同收款主体的当月订单内先进先出。')+
+ arMetric('estimate','订单测算余额',s.estimated,'当期财务应收减已分配回款','订单测算余额 = 已审核财务应收按订单冲销后的应收金额合计 − 已分配回款。','按 ERP 业务日期取统计期内的财务应收。暂估应收和期初未结余额另行核对。',yuan(s.estimated+s.paid)+' − '+yuan(s.paid)+' = '+yuan(s.estimated))+
+ arMetric('terms','订单缺账期余额',s.missing_terms,'供订单核对','订单缺账期余额 = 无法确认信用期的订单未结余额之和。','这部分金额已计入订单测算余额。信用期为 0 天时，到期日按 ERP 业务日期计算。')+
+ arMetric('difference','账面与订单测算净差',s.difference,'供期末余额核对','账面与订单测算净差 = 账面期末余额 − 订单测算余额。','按平台全量汇总计算，可能含期初未结应收、实际核销和调整差异。',yuan(s.book)+' − '+yuan(s.estimated)+' = '+yuan(s.difference))+'</div>';
+}
+function showArMetricHelp(card,open){
+ if(open){for(const other of document.querySelectorAll('.ar-metric'))if(other!==card)showArMetricHelp(other,false)}
+ else delete card.dataset.pinned;
+ card.querySelector('.ar-metric-help').setAttribute('aria-expanded',String(open));
+ card.querySelector('.ar-metric-tip').hidden=!open;
+}
+function bindArMetricHelp(){
+ for(const card of document.querySelectorAll('.ar-metric')){
+  const button=card.querySelector('.ar-metric-help');
+  card.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')showArMetricHelp(card,true)});
+  card.addEventListener('pointerleave',()=>{if(!card.dataset.pinned&&!button.matches(':focus-visible'))showArMetricHelp(card,false)});
+  button.addEventListener('focus',()=>{if(button.matches(':focus-visible'))showArMetricHelp(card,true)});
+  button.addEventListener('blur',()=>{if(!card.matches(':hover'))showArMetricHelp(card,false)});
+  button.addEventListener('click',()=>{
+   const pin=!card.dataset.pinned;
+   showArMetricHelp(card,pin);
+   if(pin)card.dataset.pinned='1';
+  });
+ }
+}
+function erpTrend(){
+ const rows=(state.erp?.months??[]).filter(r=>r.id.startsWith(period.slice(0,4)));
+ if(!rows.length)return '';
+ const maximum=Math.max(1,...rows.map(r=>Math.abs(r.net)));
+ const current=rows.find(r=>r.id===period);
+ return '<div class="panel erp-panel"><h2>ERP 月度收入 · '+period.slice(0,4)+' 年</h2><p class="muted">按 ERP 业务日期归月，不含税收入取本位币；未填销售订单号的明细标为「其他」。</p>'+
+ (current?'<div class="cards">'+card('所选月不含税收入',yuan(current.net),current.id)+card('所选月价税合计',knownGross(current),current.missing?'部分行缺少可核实的含税金额':'人民币本位币')+card('所选月收入明细',current.lines.toLocaleString('zh-CN')+' 行','其中其他 '+current.other.toLocaleString('zh-CN')+' 行')+'</div>':'')+
+ grid(['月份','不含税收入','价税合计（已知）','不含税收入对比','明细'],rows.map(r=>[r.id,yuan(r.net),knownGross(r),'<div class="bar" style="min-width:100px" aria-hidden="true"><div class="fill" style="width:'+100*Math.abs(r.net)/maximum+'%"></div></div>','<button type="button" data-erp-month="'+r.id+'">查看明细</button>']))+
+ (rows.some(r=>r.derived||r.missing)?'<p class="muted">部分含税金额按人民币原币价税合计或本位币净额加税额补足；仍缺数据的行未计入含税合计。</p>':'')+'</div>';
+}
+function erpReceivables(){
+ const s=state.erp.snapshot, cust=selectedCustomer();
+ return title(cust?esc(cust):'应收账款',`截至 ${s.as_of} · ERP 应收核对 · 人民币元`)+
+ (state.ar.length?'<p><button type="button" data-erp-legacy="1">查看原有应收台账</button></p>':'')+
+ (cust?'<p><a class="erp-link" href="#ar">‹ 返回客户账龄</a></p>':arMetricCards(s))+
+ (!cust?wecomActions(true):'')+
+ '<div class="erp-review"><p><b>客户逾期 181 天及以上（倒算）＝账面期末余额 − 未逾期 − 逾期 1–90 天 − 逾期 91–180 天。</b> 倒算值可能包含期初应收、缺账期和核销差异。客户缺少账面余额时显示「—」。负值表示前三档合计超过账面余额，需对账。</p><p>订单到期日＝ERP 业务日期＋客户信用期。回款优先按订单号，其次按 D 列指定月份。两者都未指定时，在实际收款当月的同客户、同收款主体订单内先进先出。</p></div>'+
+ '<div class="panel erp-panel"><h2>'+(cust?'订单明细':'客户账龄')+'</h2>'+erpSearch(cust?'搜索销售订单号或应收单号':'搜索客户名称')+'<div id="erp-data" aria-live="polite"><p class="muted">正在加载…</p></div></div>';
+}
+function wecomActions(canSend){
+ if(!state.wecom||!['admin','finance'].includes(state.role))return '';
+ return '<div class="tools">'+(canSend?'<button type="button" id="wecom-open">发送超 180 天逾期明细到企业微信</button>':'')+
+   '<button type="button" id="followup-open">推送记录与跟进</button></div>';
+}
+function erpSearch(placeholder){return '<form class="erp-search" id="erp-search"><input name="q" aria-label="'+placeholder+'" placeholder="'+placeholder+'" value="'+esc(erpQuery)+'"><button type="submit">搜索</button></form>'}
+function erpRevenue(){
+ const r=state.erp.months.find(r=>r.id===period);
+ return r?'<div class="panel erp-panel"><h2>ERP 收入明细 · '+period+'</h2><p class="muted">原始明细 '+r.lines.toLocaleString('zh-CN')+' 行 · 不含税 '+yuan(r.net)+' · 价税合计（已知） '+knownGross(r)+'</p>'+erpSearch('搜索客户或销售订单号')+'<div id="erp-data" aria-live="polite"><p class="muted">正在加载…</p></div></div>':'';
+}
+async function loadErpPanel(){
+ const mount=$('#erp-data');if(!mount)return;
+ const cust=selectedCustomer(),route=tab==='revenue'?'revenue':cust?'orders':'customers';
+ const params=new URLSearchParams({customer:cust,month:period,q:erpQuery,page:erpPage});
+ const key=route+'?'+params;erpRouteKey=key;
+ try{
+  const d=await api('erp/'+key);
+  if(!mount.isConnected||erpRouteKey!==key)return;
+  const agingHeads=['未逾期','逾期 1–90 天','逾期 91–180 天','逾期 181 天及以上（倒算）'];
+  const agedResidual=r=>r.days_181_plus<0?'<span class="late">'+yuan(r.days_181_plus)+' · 待核对</span>':erpMoney(r.days_181_plus);
+  const agingValues=r=>[erpMoney(r.current),erpMoney(r.days_1_90),erpMoney(r.days_91_180),agedResidual(r)];
+  if(route==='customers')mount.innerHTML=grid(['客户','账面期末余额','已分配回款',...agingHeads,'订单缺账期余额','订单测算余额','账面差异'],d.rows.map(r=>[
+   '<a href="#ar?'+new URLSearchParams({customer:r.customer})+'">'+esc(r.customer)+'</a>',erpMoney(r.book),erpMoney(r.paid),...agingValues(r),erpMoney(r.unknown),erpMoney(r.estimated),erpMoney(r.difference)]));
+  if(route==='orders')mount.innerHTML=(d.customer?'<p class="muted">信用期 '+(d.customer.term==null?'待确认':d.customer.term+' 天')+' · 账面期末余额 '+erpMoney(d.customer.book)+' · 已分配回款 '+erpMoney(d.customer.paid)+' · 订单测算余额 '+erpMoney(d.customer.estimated)+' · 账面差异 '+erpMoney(d.customer.difference)+'</p>'+
+   grid([...agingHeads,'订单到期日可核实的 181 天及以上'],[[...agingValues(d.customer),erpMoney(d.customer.verified_days_181_plus)]]):'')+
+   '<p class="muted">能明确配对的正负单据合并显示。订单金额按含税金额合计，未结余额和逾期天数按正式财务应收及页面截止日计算。</p>'+
+   grid(['销售订单号','收款组织','业务日期','最早未结到期日','最大逾期天数','订单金额','匹配开票金额','已分配回款','测算应收余额'],d.rows.map(r=>[
+    esc(r.order_no+(r.document?' · '+r.document:''))+(r.document_count>1?' <small>（正负合并）</small>':''),esc(r.org||'—'),r.first_day,r.first_due??'—',r.max_days??(r.unknown?'待确认':'—'),erpMoney(r.order_total),erpMoney(r.invoiced),erpMoney(r.paid),erpMoney(r.estimated)]));
+  if(route==='revenue')mount.innerHTML='<details><summary>按收入业务类型汇总</summary>'+grid(['收入业务类型','不含税金额','价税合计（已知）','行数'],d.kinds.map(r=>[esc(r.kind||'未填'),yuan(r.net),knownGross(r),r.lines]))+'</details>'+
+   grid(['销售订单号','业务日期','收入业务类型','客户','不含税金额本位币','价税合计本位币','发票号'],d.rows.map(r=>[esc(r.order_no)+(r.source_lines>1?' <small>（'+r.source_lines+' 条合计）</small>':''),r.date,esc(r.kind||'—'),esc(r.customer||'—'),yuan(r.net),r.source_lines>1?knownGross(r):erpMoney(r.gross),esc(r.invoice||'—')]));
+  if(d.page>1||d.next)mount.insertAdjacentHTML('beforeend','<div class="tools erp-more">'+(d.page>1?'<button type="button" data-erp-page="'+(d.page-1)+'">上一页</button>':'')+'<span>第 '+d.page+' 页</span>'+(d.next?'<button type="button" data-erp-page="'+(d.page+1)+'">下一页</button>':'')+'</div>');
+ }catch(error){if(mount.isConnected)mount.innerHTML='<p class="error">'+esc(error.message)+'</p>'}
+}
+let biRiskMode='residual';
+const biLabels={residual:'账面倒算',verified:'订单核实'};
+const biWan=new Intl.NumberFormat('zh-CN',{maximumFractionDigits:1,minimumFractionDigits:1});
+const biCompact=value=>biWan.format(value/1000000)+' 万';
+const biPeriod=value=>Number(value.slice(5))+' 月';
+const biClient=customer=>'#ar?'+new URLSearchParams({customer});
+
+function biMetric(label,value,detail,tone=''){
+ return '<article class="bi-metric '+tone+'"><span>'+label+'</span><strong>'+value+'</strong><small>'+detail+'</small></article>';
+}
+
+function biRevenueChart(months,selected){
+ const high=Math.max(1,...months.map(r=>r.net)),low=Math.min(0,...months.map(r=>r.net));
+ const step=10**Math.floor(Math.log10(high));
+ const upper=Math.ceil(high/step)*step;
+ const lower=low<0?Math.floor(low/step)*step:0;
+ const span=upper-lower,zero=100*upper/span;
+ const ticks=[upper,(3*upper+lower)/4,(upper+lower)/2,(upper+3*lower)/4,lower];
+ const guides=ticks.map((v,i)=>'<div class="bi-guide" style="--level:'+i*25+'%"><span>'+Math.round(v/1000000).toLocaleString('zh-CN')+'</span></div>').join('');
+ const bars=months.map(m=>{
+  const chosen=m.id===period;
+  const start=m.net>0?100*(upper-m.net)/span:zero;
+  const size=100*Math.abs(m.net)/span;
+  const label=m.id+' 不含税收入 '+yuan(m.net);
+  return '<button type="button" class="bi-month '+(m.net<0?'negative':'')+'" data-bi-month="'+m.id+'" aria-pressed="'+chosen+'" aria-label="'+esc(label)+'" title="'+esc(label)+'"><span class="bi-column" style="--start:'+start+'%;--size:'+size+'%"></span><span class="bi-month-label">'+biPeriod(m.id)+'</span></button>';
+ }).join('');
+ return '<section class="bi-panel"><div class="bi-panel-head"><div><h2>月度收入趋势</h2><p>'+period.slice(0,4)+' 年 · ERP 不含税 · 万元</p></div>'+
+ (selected?'<button type="button" class="bi-text-button" data-erp-month="'+period+'">'+biPeriod(period)+'明细 ↗</button>':'')+'</div>'+
+ (months.length?'<div class="bi-chart"><div class="bi-guides" aria-hidden="true">'+guides+'</div><div class="bi-bars" aria-label="点击月份切换收入指标">'+bars+'</div></div>':'<p class="empty">所选年度暂无 ERP 月度收入。</p>')+'</section>';
+}
+
+function biAgingChart(aging){
+ const buckets=[['未逾期',aging.current,'#147d72'],['逾期 1–90 天',aging.short,'#57aa9c'],['逾期 91–180 天',aging.middle,'#e6a94e'],['逾期 181 天及以上',aging.long,'#d76e53'],['账期待确认',aging.unknown,'#a7b6c6']];
+ const total=sum(buckets,([,value])=>value);
+ let start=0;
+ const stops=buckets.filter(([,value])=>value>0).map(([,value,color])=>{
+  const end=start+100*value/total;
+  const stop=color+' '+start+'% '+end+'%';
+  start=end;
+  return stop;
+ });
+ const gradient=stops.length?'conic-gradient('+stops.join(',')+')':'#e7edf2';
+ return '<section class="bi-panel"><div class="bi-panel-head"><div><h2>应收账龄结构</h2><p>按订单到期日测算 · 含账期待确认金额</p></div></div>'+
+ '<div class="bi-aging"><div class="bi-donut" style="--segments:'+gradient+'"><div><small>订单测算余额</small><strong>'+biCompact(total)+'</strong></div></div>'+
+ '<ul class="bi-legend">'+buckets.map(([label,value,color])=>'<li><i style="--swatch:'+color+'"></i><span>'+label+'</span><b title="'+yuan(value)+'">'+biCompact(value)+'</b></li>').join('')+'</ul></div></section>';
+}
+
+function biRiskRows(rows,mode){
+ return rows.filter(r=>r[mode]>0).sort((a,b)=>b[mode]-a[mode]||a.customer.localeCompare(b.customer,'zh-CN'));
+}
+
+function biRiskPanel(exposure,aging){
+ const mode=biRiskMode,rows=biRiskRows(exposure,mode);
+ const top=rows.slice(0,5),total=sum(rows,r=>r[mode]);
+ const topShare=pct(sum(top,r=>r[mode]),total);
+ const note=mode==='residual'
+  ? '倒算额可能含期初应收、缺账期和核销差异。另有 '+aging.needs_review+' 家倒算为负，待核对。'
+  : '按到期日可核实的未结订单余额汇总。';
+ const ranking=top.map((r,i)=>'<li><span class="bi-rank-number">'+String(i+1).padStart(2,'0')+'</span><div><a href="'+biClient(r.customer)+'">'+esc(r.customer)+'</a><div class="bi-rank-track"><span style="width:'+100*r[mode]/top[0][mode]+'%"></span></div></div><strong>'+yuan(r[mode])+'</strong></li>').join('');
+ const all=rows.map(r=>['<a href="'+biClient(r.customer)+'">'+esc(r.customer)+'</a>',erpMoney(r.book),erpMoney(r.residual),yuan(r.verified)]);
+ return '<section class="bi-panel bi-risk" id="bi-long-overdue"><div class="bi-panel-head"><div><h2>逾期超过 180 天的客户</h2><p>按金额降序 · 点击客户查看订单</p></div><div class="bi-switch" role="group" aria-label="逾期金额口径">'+Object.entries(biLabels).map(([key,label])=>'<button type="button" data-bi-risk="'+key+'" aria-pressed="'+(mode===key)+'">'+label+'</button>').join('')+'</div></div>'+
+ '<div class="bi-risk-grid"><div class="bi-risk-insight"><small>'+biLabels[mode]+' · 逾期 181 天及以上</small><strong>'+yuan(total)+'</strong><dl><div><dt>涉及客户</dt><dd>'+rows.length+' 家</dd></div><div><dt>前五客户占比</dt><dd>'+topShare+'</dd></div></dl><p>'+note+'</p></div>'+
+ (top.length?'<ol class="bi-ranking">'+ranking+'</ol>':'<p class="empty">暂无符合该口径的客户。</p>')+'</div>'+
+ (rows.length?'<details class="bi-all"><summary>查看全部 '+rows.length+' 家客户</summary>'+grid(['客户','账面期末余额','181 天及以上（倒算）','181 天及以上（订单核实）'],all)+'</details>':'')+'</section>';
+}
+
+function executiveDashboard(){
+ const {snapshot:s,aging,exposure}=state.erp;
+ const months=state.erp.months.filter(r=>r.id.startsWith(period.slice(0,4)));
+ const ytd=months.filter(r=>r.id<=period),current=months.find(r=>r.id===period);
+ const previous=state.erp.months.find(r=>{
+  const [year,month]=period.split('-').map(Number);
+  return r.id===(month===1?(year-1)+'-12':year+'-'+String(month-1).padStart(2,'0'));
+ });
+ const mom=current&&previous?.net?pct(current.net-previous.net,Math.abs(previous.net)):'—';
+ const residualRows=biRiskRows(exposure,'residual');
+ const report=state.report.find(r=>r.id===period);
+ return '<div class="bi-dashboard"><section class="bi-hero"><div><p class="bi-kicker">财务与经营</p><h1>经营驾驶舱</h1><p>月度收入、资金回收与客户账龄</p></div><div class="bi-dates"><div><span>收入期间</span><b>'+period+'</b></div><div><span>应收截止日</span><b>'+s.as_of+'</b></div></div></section>'+
+ '<section class="bi-metrics" aria-label="核心经营指标">'+
+ biMetric('本年累计 ERP 收入',ytd.length?yuan(sum(ytd,r=>r.net)):'—',ytd.length?'不含税 · 至 '+ytd.at(-1).id:'所选期间暂无 ERP 收入')+
+ biMetric('当月 ERP 收入',current?yuan(current.net):'—','不含税 · 较上月 <b>'+mom+'</b>')+
+ biMetric('账面期末应收',yuan(s.book),s.book_customers+' 家客户 · '+s.as_of)+
+ biMetric('已分配回款',yuan(s.paid),'已分配至财务应收')+
+ biMetric('逾期 180 天以上',yuan(sum(residualRows,r=>r.residual)),residualRows.length+' 家 · 账面倒算正值合计','bi-metric-risk')+'</section>'+
+ '<div class="bi-charts">'+biRevenueChart(months,current)+biAgingChart(aging)+'</div>'+biRiskPanel(exposure,aging)+
+ (report?'<section class="bi-panel bi-report"><div class="bi-panel-head"><div><h2>合并报表指标</h2><p>'+period+(report.cumulative?' · 本年累计':' · 当月')+'</p></div><button class="bi-text-button" type="button" data-tab="statements">查看财务报表 ↗</button></div><div class="bi-metrics bi-report-metrics">'+
+ biMetric('营业收入',yuan(report.revenue),'合并利润表')+biMetric('毛利率',pct(report.revenue-report.cost,report.revenue),'营业收入减营业成本')+biMetric(report.company?'营业利润':'经营利润（简化）',yuan(report.operating??report.revenue-report.cost-report.expense),'合并报表口径')+biMetric('经营现金流净额',yuan(report.cash),'现金流量表')+'</div></section>':'')+
+ (months.length?'<details class="bi-monthly"><summary>查看 ERP 月度收入底表</summary>'+erpTrend()+'</details>':'')+'</div>';
+}
+
+const biExamples=['营业收入和毛利率','本年每月 ERP 收入趋势','逾期客户前 5 名'];
+let biDraft='',biResult=null,biBusy=false,biStatus='',biStatusError=false,biSpeechStatus='',biSpeech=null;
+const biVoiceType=()=>window.SpeechRecognition||window.webkitSpeechRecognition;
+const biPreferenceKey=()=> 'finance.bi.model:'+state.email;
+function biSelectedModel(){
+ let saved;
+ try{saved=localStorage.getItem(biPreferenceKey())}catch{}
+ return state.bi.models.find(m=>m.id===saved)??state.bi.models.find(m=>m.id===state.bi.defaultModel);
+}
+let biModelOverride;
+let biRequestVersion=0;
+function biResetSession(){
+ biStopVoice();biRequestVersion++;
+ biModelOverride=undefined;biDraft='';biResult=null;biBusy=false;
+ biStatus='';biStatusError=false;biSpeechStatus='';
+}
+function biCurrentModel(){
+ return state.bi.models.find(m=>m.id===biModelOverride)??biSelectedModel();
+}
+function biSetModel(id){
+ if(!state.bi.models.some(m=>m.id===id))return;
+ biModelOverride=id;
+ try{localStorage.setItem(biPreferenceKey(),id)}catch{}
+ const description=$('#bi-model-info');
+ if(description)description.textContent=biModelDescription(biCurrentModel());
+}
+function biModelDescription(model){
+ return model.model?model.provider+' · '+model.model+'。提交后，需求文字及期间会发送给该模型；财务数据在工作台内计算。':
+  '使用工作台本地规则解析，无需连接大模型。';
+}
+function biModelPicker(id,label){
+ const selected=biCurrentModel().id;
+ return '<label>'+label+'<select id="'+id+'" aria-describedby="bi-model-info">'+state.bi.models.map(m=>
+  '<option value="'+esc(m.id)+'"'+(selected===m.id?' selected':'')+'>'+esc(m.name)+'</option>').join('')+'</select></label>';
+}
+function aiModelsPage(){
+ const model=biCurrentModel(),hasModels=state.bi.models.length>1;
+ return title('AI 模型','查看工作台使用的模型，并为自己的 BI 分析选择默认方案。')+
+ '<section class="panel bi-model-box"><h2>用于 BI 的模型</h2>'+biModelPicker('bi-preferred-model','我的模型')+
+ '<p id="bi-model-info" class="muted" role="status">'+esc(biModelDescription(model))+'</p>'+
+ (hasModels?'':'<p class="muted">当前未接入大模型。管理员可在服务端配置已获准使用的模型，启用后会出现在这里。</p>')+
+ '<button type="button" class="primary" data-tab="dashboard">进入 BI 看板</button></section>'+
+ '<section class="panel bi-model-box"><h2>可选方案</h2>'+grid(['名称','服务商','模型标识'],state.bi.models.map(m=>
+  [esc(m.name)+(m.id===state.bi.defaultModel?' <small>（平台默认）</small>':''),esc(m.provider),esc(m.model??'本地规则')]))+
+ '<p class="muted">模型用于理解指标需求，数值按工作台的财务口径计算。模型偏好保存在当前浏览器。</p></section>';
+}
+function biAssistantPanel(){
+ return '<section class="panel bi-assistant" aria-labelledby="bi-assistant-title">'+
+ '<div class="bi-panel-head"><div><p class="bi-ai-kicker">自定义分析</p><h2 id="bi-assistant-title">智能指标</h2><p>用文字或中文语音提出需求，生成指标卡、月度图表或客户排行。</p></div>'+
+ '<button type="button" class="bi-text-button" data-tab="ai-models">查看 AI 模型</button></div>'+
+ '<form id="bi-request" class="bi-request"><label for="bi-prompt">想看什么指标？</label>'+
+ '<textarea id="bi-prompt" placeholder="例如：查看 10 月营业收入和毛利率" rows="2" maxlength="300" required>'+esc(biDraft)+'</textarea>'+
+ '<div class="bi-ai-actions">'+biModelPicker('bi-request-model','分析方式')+
+ '<button type="button" id="bi-voice" class="bi-voice" aria-pressed="'+Boolean(biSpeech)+'" aria-describedby="bi-voice-help bi-voice-status" '+(!biVoiceType()||!window.isSecureContext?'disabled':'')+'>'+(biSpeech?'结束语音':'🎙 语音输入')+'</button>'+
+ '<button type="submit" class="primary" id="bi-generate" '+(biBusy?'disabled':'')+'>'+(biBusy?'正在生成…':'生成指标')+'</button></div>'+
+ '<small id="bi-model-info">'+esc(biModelDescription(biCurrentModel()))+'</small>'+
+ '<small id="bi-voice-help">'+(biVoiceType()&&window.isSecureContext?'语音由浏览器识别，可能使用其在线服务。识别后可先编辑，再提交。':'当前浏览器或访问地址不支持语音输入。可继续打字，或使用支持语音识别的浏览器通过 HTTPS 或本机地址访问。')+'</small>'+
+ '<small id="bi-voice-status" role="status">'+esc(biSpeechStatus)+'</small></form>'+
+ '<div class="bi-ai-examples" aria-label="需求示例"><small>试试</small>'+biExamples.map((example,i)=>
+  '<button type="button" data-bi-example="'+i+'">'+esc(example)+'</button>').join('')+'</div>'+
+ '<p id="bi-request-status" role="status" class="'+(biStatusError?'error':'muted')+'">'+esc(biStatus)+'</p>'+
+ '<div id="bi-results">'+biRenderResults()+'</div></section>';
+}
+function biValue(value,unit){return value==null?'—':unit==='percent'?pct(value,1):yuan(value)}
+function biResultSeries(result){
+ const points=result.points;
+ const low=Math.min(0,...points.map(p=>p.value??0)),high=Math.max(0,...points.map(p=>p.value??0));
+ const span=high-low||1,zero=100*(-low)/span;
+ const rows=points.map(p=>{
+  const value=biValue(p.value,result.unit),size=100*Math.abs(p.value??0)/span;
+  const start=p.value<0?zero-size:zero;
+  return '<li><span>'+esc(p.period)+'</span><span class="bi-ai-track" aria-hidden="true" style="--zero:'+zero+'%">'+
+   (p.value!=null?'<i class="'+(p.value<0?'negative':'')+'" style="--offset:'+start+'%;--width:'+size+'%"></i>':'')+
+   '</span><b>'+value+'</b></li>';
+ }).join('');
+ return '<article class="bi-series"><h3>'+esc(result.label)+'</h3><small>'+esc(result.source)+'</small>'+
+  '<ul class="bi-ai-chart">'+rows+'</ul>'+(result.note?'<small>'+esc(result.note)+'</small>':'')+'</article>';
+}
+function biRenderResults(){
+ if(!biResult)return '';
+ const result=biResult,model=state.bi.models.find(m=>m.id===result.model);
+ const heading='<div class="bi-results-head"><h3>分析结果</h3><small>'+esc(model?.name??result.model)+
+  (result.display==='trend'?' · '+result.from+(result.from===result.to?'':' 至 '+result.to):'')+'</small></div>';
+ if(result.display==='rank'){
+  const rank=result.results[0];
+  return heading+'<p class="muted">'+esc(rank.label)+' · '+esc(rank.source)+(rank.asOf?' · 截至 '+esc(rank.asOf):'（暂无快照）')+'</p>'+
+   grid(['排名','客户','逾期金额'],rank.rows.map((r,i)=>[i+1,esc(r.label),yuan(r.value)]));
+ }
+ if(result.display==='trend')return heading+'<div class="bi-series-grid">'+result.results.map(biResultSeries).join('')+'</div>'+
+  '<small>— 表示所选期间暂无可用数据。</small>';
+ return heading+'<div class="bi-ai-cards">'+result.results.map(r=>{
+  const p=r.points[0];
+  return card(esc(r.label),biValue(p.value,r.unit),esc([r.source,p.period,p.scope,p.value==null?'暂无数据':''].filter(Boolean).join(' · ')));
+ }).join('')+'</div>';
+}
+function biUpdateVoice(){
+ const button=$('#bi-voice');
+ if(!button)return;
+ button.textContent=biSpeech?'结束语音':'🎙 语音输入';
+ button.setAttribute('aria-pressed',String(Boolean(biSpeech)));
+ $('#bi-voice-status').textContent=biSpeechStatus;
+}
+function biStopVoice(){
+ if(!biSpeech)return;
+ const recognition=biSpeech;
+ biSpeech=null;
+ biSpeechStatus='';
+ try{recognition.abort()}catch{}
+ biUpdateVoice();
+}
+function biStartVoice(){
+ if(biSpeech){try{biSpeech.stop()}catch{biStopVoice()}return}
+ const Voice=biVoiceType();
+ if(!Voice||!window.isSecureContext)return;
+ const field=$('#bi-prompt');
+ const prefix=field.value.trimEnd();
+ let recognition;
+ try{recognition=new Voice()}catch{biSpeechStatus='无法启动语音输入，可直接输入文字。';biUpdateVoice();return}
+ recognition.lang='zh-CN';
+ recognition.interimResults=true;
+ recognition.continuous=false;
+ let heard=false;
+ recognition.onstart=()=>{if(biSpeech===recognition){biSpeechStatus='正在听，请用普通话说出指标需求。';biUpdateVoice()}};
+ recognition.onresult=event=>{
+  if(biSpeech!==recognition)return;
+  const transcript=Array.from(event.results,r=>r[0].transcript).join('').trim();
+  if(!transcript)return;
+  heard=true;
+  biDraft=(prefix?prefix+' '+transcript:transcript).slice(0,300);
+  const input=$('#bi-prompt');
+  if(input)input.value=biDraft;
+ };
+ recognition.onerror=event=>{
+  if(biSpeech!==recognition)return;
+  biSpeech=null;
+  biSpeechStatus=['not-allowed','service-not-allowed'].includes(event.error)?'麦克风权限未开启。请允许访问麦克风，或直接输入文字。':
+   event.error==='no-speech'?'没有听到语音。请重试或直接输入文字。':'语音识别暂不可用，请重试或直接输入文字。';
+  biUpdateVoice();
+ };
+ recognition.onend=()=>{
+  if(biSpeech!==recognition)return;
+  biSpeech=null;
+  biSpeechStatus=heard?'已填入识别文字，可编辑后生成。':'没有识别到文字，请重试或直接输入。';
+  biUpdateVoice();
+ };
+ biSpeech=recognition;biSpeechStatus='正在启动麦克风…';biUpdateVoice();
+ try{recognition.start()}catch{biSpeech=null;biSpeechStatus='无法启动麦克风，可直接输入文字。';biUpdateVoice()}
+}
+async function biSubmit(){
+ if(biBusy)return;
+ biStopVoice();
+ biDraft=$('#bi-prompt').value;
+ if(!biDraft.trim()){$('#bi-prompt').focus();return}
+ biBusy=true;biStatus='正在生成指标…';biStatusError=false;
+ const version=++biRequestVersion;
+ biUpdateRequest();
+ try{
+  const result=await api('bi/generate',{prompt:biDraft,model:biCurrentModel().id,period});
+  if(version!==biRequestVersion)return;
+  biResult=result;
+  biStatus='指标已生成。再次提交可更新结果。';
+  const output=$('#bi-results');
+  if(output)output.innerHTML=biRenderResults();
+ }catch(error){
+  if(version!==biRequestVersion)return;
+  biStatus=error.message+(biResult?' 下方保留上一次生成的结果。':'');
+  biStatusError=true;
+ }finally{if(version===biRequestVersion){biBusy=false;biUpdateRequest()}}
+}
+function biUpdateRequest(){
+ const button=$('#bi-generate');
+ if(!button)return;
+ button.disabled=biBusy;button.textContent=biBusy?'正在生成…':'生成指标';
+ const status=$('#bi-request-status');
+ status.textContent=biStatus;
+ status.className=biStatusError?'error':'muted';
+}
+
+function dashboard(){
+ if(state.erp?.snapshot)return executiveDashboard();
+ const t=today(),ar=periodReceivables(), reports=state.report.filter(r=>!r.cumulative&&r.id.slice(0,4)===period.slice(0,4)&&r.id<=period);
+ const report=state.report.find(r=>r.id===period);
+ const total=sum(ar,balance),overdue=sum(ar.filter(r=>r.due<t),balance);
+ const aging=[0,0,0,0,0];
+ for(const r of ar){const d=days(t,r.due);aging[d===0?0:d<=30?1:d<=60?2:d<=90?3:4]+=balance(r)}
+ const maximum=Math.max(...reports.map(r=>Math.abs(r.revenue)),1);
+ return title('财务概览','人民币 · 应收按开单月筛选，余额与逾期状态截至今天。')+
+ '<div class="cards">'+card('应收余额',yuan(total),'应收金额减已收金额')+card('逾期余额',yuan(overdue),'到期日早于今天的未收金额')+card('逾期率',pct(overdue,total),'逾期余额 ÷ 应收余额')+card('累计回款率',pct(sum(ar,r=>r.paid),sum(ar,r=>r.amount)),'已收金额 ÷ 应收金额')+'</div>'+
+ '<div class="panels"><div class="panel"><h2>应收账龄</h2>'+aging.map((v,i)=>'<div class="line"><span>'+['未逾期','1–30 天','31–60 天','61–90 天','90 天以上'][i]+'</span><b>'+yuan(v)+'</b></div><div class="bar"><div class="fill" style="width:'+(total?100*v/total:0)+'%"></div></div>').join('')+
+ '</div><div class="panel"><h2>合并报表收入趋势 · 截至所选月</h2>'+(reports.length?reports.map(r=>'<div class="line"><span>'+r.id+'</span><b>'+yuan(r.revenue)+'</b></div><div class="bar"><div class="fill" style="width:'+100*Math.abs(r.revenue)/maximum+'%"></div></div>').join(''):'<p class="empty">所选年度截至该月暂无合并报表收入数据。</p>')+'</div></div>'+
+ '<div class="panel"><h2>'+(report?.cumulative?'本年累计经营指标':'月度经营指标')+'</h2>'+(report?'<div class="cards">'+card('营业收入',yuan(report.revenue),'报表收入')+card('毛利率',pct(report.revenue-report.cost,report.revenue),'毛利 ÷ 营业收入')+card(report.company?'营业利润':'经营利润（简化口径）',yuan(report.operating??report.revenue-report.cost-report.expense),report.company?'合并利润表原值':'收入 − 营业成本 − 期间费用')+card('经营现金流净额',yuan(report.cash),'报表原值')+'</div>':'<p class="empty">所选月份暂无财务报表。</p>')+'</div>';
+}
+function revenues(){
+ const reports=state.report;
+ const current=reports.find(r=>r.id===period);
+ if(!current)return title('收入管理',state.erp?.months.some(r=>r.id===period)?'按 ERP 业务日期查询收入明细。':'所选月份暂无收入数据。')+erpRevenue();
+ const index=reports.indexOf(current);
+ const prior=reports[index-1];
+ const [year,m]=current.id.split('-').map(Number);
+ const previousId=m===1?(year-1)+'-12':year+'-'+String(m-1).padStart(2,'0');
+ const yoy=reports.find(r=>r.id===(year-1)+current.id.slice(4));
+ const change=base=>!current.cumulative&&!base?.cumulative&&base?.revenue?pct(current.revenue-base.revenue,Math.abs(base.revenue)):'—';
+ return title('收入管理',current.cumulative?'截至所选月的本年累计收入和毛利。':'按月查看合并口径营业收入和毛利。')+erpRevenue()+
+ '<div class="cards">'+card('营业收入',yuan(current.revenue),current.cumulative?'本年累计':'报表当月')+(current.cumulative?'':card('收入环比',change(prior?.id===previousId?prior:null),'较上月')+card('收入同比',change(yoy),'较上年同月'))+card('毛利',yuan(current.revenue-current.cost),'毛利率 '+pct(current.revenue-current.cost,current.revenue))+'</div>'+
+ '<div class="panel"><h2>'+(current.cumulative?'本年累计收入台账':'月度收入台账')+'</h2>'+grid(['报表期间','营业收入','营业成本','毛利','毛利率'],[[current.id,yuan(current.revenue),yuan(current.cost),yuan(current.revenue-current.cost),pct(current.revenue-current.cost,current.revenue)]])+'</div>'+
+ '';
+}
+function financialStatements(){
+ const report=state.report.find(r=>r.id===period);
+ const detail=report?.company?.[statement]||[];
+ const value=v=>v===null?'—':yuan(v);
+ const columns=statement==='balance'?['科目','期末','期初']:report?.cumulative?['科目','本年累计']:['科目','当月','本年累计（原表）'];
+ const rows=detail.map(([name,a,b])=>[esc(name),...(statement!=='balance'&&report?.cumulative?[value(b)]:[value(a),value(b)])]);
+ const empty=statement==='balance'&&report?.company?'所选月份暂无资产负债表。请导入报表日期为该月的公司报表。':'所选月份暂无这张报表。请导入该期间的公司合并财务报表。';
+ return title('财务报表',period+' · 合并报表 · 人民币元')+
+ '<div class="panel"><div class="tools" role="tablist" aria-label="报表类型">'+statementTabs.map(([key,name])=>{
+  const active=key===statement;
+  return '<button type="button" role="tab" id="statement-'+key+'" data-statement="'+key+'" aria-controls="statement-panel" aria-selected="'+active+'" tabindex="'+(active?0:-1)+'" class="'+(active?'active':'')+'">'+name+'</button>';
+ }).join('')+'</div><section id="statement-panel" role="tabpanel" aria-labelledby="statement-'+statement+'">'+
+ (rows.length?grid(columns,rows):'<p class="empty">'+empty+'</p>')+'</section></div>';
+}
+function receivables(){
+ if(state.erp?.snapshot&&!erpLegacy)return erpReceivables();
+ const t=today();
+ const status=r=>!balance(r)?'paid':r.due<t?'late':'open';
+ const list=periodReceivables().filter(r=>(filter==='all'||status(r)===filter)&&(r.id+' '+r.customer).toLowerCase().includes(query.toLowerCase()));
+ return title('应收账款','按开单月份筛选。余额和到期状态截至今天。')+(erpLegacy?'<button type="button" data-erp-legacy="0">返回 ERP 客户账龄</button>':'')+
+ wecomActions(false)+
+ '<div class="tools"><input id="query" aria-label="客户或单据编号" placeholder="搜索客户或单据编号" value="'+esc(query)+'"><select id="filter" aria-label="单据状态">'+[['all','全部状态'],['open','未到期'],['late','已逾期'],['paid','已结清']].map(([k,v])=>'<option value="'+k+'" '+(k===filter?'selected':'')+'>'+v+'</option>').join('')+'</select><small>共 '+list.length+' 笔</small></div><div class="panel">'+grid(['单据编号','客户','到期日','应收','已收','余额','状态',...(canWrite()?['操作']:[])],list.map(r=>[esc(r.id),esc(r.customer),r.due,yuan(r.amount),yuan(r.paid),yuan(balance(r)),{paid:'已结清',late:'<span class="late">已逾期</span>',open:'未逾期'}[status(r)],...(canWrite()?[balance(r)?'<button data-payment="'+esc(r.id)+'">登记回款</button>':'—']:[])]))+'</div>';
+}
+function imports(){
+ if(kind==='company')return title('Excel 导入','上传公司原格式的合并财务报表。')+
+ '<div class="panel"><label>数据类型<select id="kind"><option value="ar">应收账款</option><option value="report">月度财务报表</option><option value="company" selected>公司合并财务报表</option></select></label><p>读取合并资产负债表、合并利润表及合并现金流量表。按封账日期导入当年已结束的月份。</p><label>选择原格式 .xlsx<input type="file" id="file" accept=".xlsx"></label></div>'+
+ (pending?'<div class="panel"><h2>预览合并报表</h2><p>'+pending.length+' 个月，已有 '+pending.filter(r=>state.report.some(s=>s.id===r.id)).length+' 个月将更新。</p>'+grid(['月份','营业收入','营业成本','营业利润','经营现金流净额'],pending.map(r=>[r.id,yuan(r.revenue),yuan(r.cost),yuan(r.operating),yuan(r.cash)]))+'<p><button id="commit" class="primary">确认导入 '+pending.length+' 个月</button></p></div>':'');
+ if(kind==='report')return title('Excel 导入','请使用公司的月度财务报表模板。')+
+ '<div class="panel"><h2>选择数据类型</h2><div class="tools"><select id="kind" aria-label="数据类型"><option value="ar">应收账款</option><option value="report" selected>月度财务报表</option><option value="company">公司合并财务报表</option></select><a href="/monthly-template.xlsx" download="月度财务报表模版.xlsx">下载公司月度财务报表模板（XLSX）</a></div><p class="muted">填写三张合并主表的期末、期初及本年累计数据。累计版按报表日期入库。</p><label>选择报表文件<input type="file" id="file" accept=".xlsx,.csv"></label></div>'+
+ (pending?'<div class="panel"><h2>预览月度报表</h2><p>'+pending.length+' 个期间，已有 '+pending.filter(r=>state.report.some(s=>s.id===r.id)).length+' 个期间将更新。</p>'+grid(['月份','口径','营业收入','营业成本','期间费用','经营现金流净额'],pending.map(r=>[r.id,r.cumulative?'本年累计':'当月',yuan(r.revenue),yuan(r.cost),yuan(r.expense),yuan(r.cash)]))+'<p><button id="commit" class="primary">确认导入</button></p></div>':'');
+ const spec=specs[kind];
+ return title('Excel 导入','读取第一个工作表。金额用人民币元，日期用 YYYY-MM-DD，月份用 YYYY-MM。')+
+ '<div class="panel"><h2>选择数据类型</h2><div class="tools"><select id="kind" aria-label="数据类型"><option value="ar">应收账款</option><option value="report" '+(kind==='report'?'selected':'')+'>月度财务报表</option><option value="company">公司合并财务报表</option></select><button id="template">下载 Excel 可打开的 CSV 模板</button></div><p class="muted">必填列 · '+spec.fields.join('、')+'</p><p class="muted">同编号或同月份的导入记录将替换旧记录，应收表的已收金额也会更新。每批最多 500 行。</p><label>选择 .xlsx 或 .csv 文件<input type="file" id="file" accept=".xlsx,.csv"></label></div>'+
+ (pending?'<div class="panel"><h2>导入预览</h2><p>'+pending.length+' 行，已有记录将更新 '+pending.filter(r=>state[kind].some(s=>s.id===r.id)).length+' 行。</p>'+grid(spec.fields,pending.slice(0,8).map(r=>Object.values(r).map(v=>typeof v==='number'?yuan(v):esc(v))))+'<p><button id="commit" class="primary">确认导入 '+pending.length+' 行</button></p></div>':'');
+}
+function members(){
+ return title('人员与权限',localAccounts?'先为同事的工作邮箱分配角色，再生成邀请码。已注册的成员可由管理员协助重置密码。':'成员使用自己的 ChatGPT 账号登录。站点访问名单与这里的业务角色均需授权。')+
+ (localAccounts?'<div class="panel"><h2>账号邀请与重置</h2><p>生成一次性邀请码或重置码，私下转交给对应成员。</p><a href="/account/access">生成邀请码或重置码</a></div>':'')+
+ '<div class="panel"><h2>成员角色与预算部门</h2><p>预算填报员只能使用预算管理，并须指定部门。相同部门名称的成员共用一份年度预算。财务和管理员可审核各部门预算；如需填报本部门预算，也请设置部门。</p><form id="member"><label>登录邮箱<input name="email" type="email" required></label><label>角色<select name="role"><option value="budget">预算填报员</option><option value="viewer">只读人员</option><option value="finance">财务人员</option><option value="admin">管理员</option><option value="remove">撤销角色</option></select></label><label>预算部门<input name="department" list="budget-departments" maxlength="60" placeholder="例如：市场部"></label><datalist id="budget-departments">'+[...new Set(state.members.map(m=>m.department).filter(Boolean))].map(d=>'<option value="'+esc(d)+'"></option>').join('')+'</datalist><button class="primary">保存</button></form>'+
+ grid(['登录邮箱','业务角色','预算部门','操作'],state.members.map((m,i)=>[esc(m.email),roleName[m.role],esc(m.department||'—'),'<button type="button" data-member-edit="'+i+'">编辑</button>']))+'</div>';
+}
+const skillDate=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',dateStyle:'medium'});
+let skillList=[],skillQuery='',skillCategory='',skillStatus='published';
+const skillsPage=()=>title('技能中心','查找财务团队共享的技能、工具入口和使用说明。')+'<div id="skills-page"><p class="muted" role="status">正在加载技能…</p></div>';
+const skillLabels=s=>'<div class="skill-labels"><span>'+esc(s.category)+'</span><span>版本 '+esc(s.version)+'</span>'+(!s.published?'<span class="unpublished">已下架</span>':'')+'</div>';
+const canManageSkill=s=>state.role==='admin'||(state.role==='finance'&&state.email===s.owner);
+function renderSkillResults(){
+ const results=$('#skills-results');if(!results)return;
+ const terms=skillQuery.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+ const available=skillList.filter(s=>Boolean(s.published)===(skillStatus==='published'));
+ const rows=available.filter(s=>(!skillCategory||s.category===skillCategory)&&terms.every(t=>[s.name,s.summary,s.category,s.owner].some(v=>v.toLocaleLowerCase().includes(t))));
+ $('#skills-count').textContent=rows.length+' 项技能';
+ results.innerHTML=rows.length?rows.map(s=>'<article class="panel skill-card">'+skillLabels(s)+'<h2>'+esc(s.name)+'</h2><p>'+esc(s.summary)+'</p><small>维护人：'+esc(s.owner)+'</small><button type="button" data-skill-open="'+esc(s.id)+'">查看详情</button></article>').join(''):
+ '<div class="panel"><h2>'+(available.length?'没有符合条件的技能':skillStatus==='published'?'暂无已发布的技能':'暂无已下架的技能')+'</h2><p class="muted">'+(available.length?'试试其他关键词，或选择全部分类。':skillStatus==='published'?(canWrite()?'点击「发布技能」共享第一个技能。':'财务同事发布技能后，会在这里显示。'):'已下架的技能可以在详情页重新发布。')+'</p></div>';
+}
+function renderSkillList(root){
+ const categories=[...new Set(skillList.filter(s=>Boolean(s.published)===(skillStatus==='published')).map(s=>s.category))].sort((a,b)=>a.localeCompare(b,'zh-CN'));
+ if(!categories.includes(skillCategory))skillCategory='';
+ root.innerHTML='<div class="skills-head"><div><h2 id="skills-list-title" tabindex="-1">技能目录</h2><p class="muted" id="skills-count" aria-live="polite"></p></div>'+(canWrite()?'<button class="primary" type="button" id="skill-new">发布技能</button>':'')+'</div>'+
+ '<div class="skills-filters"><label>搜索技能<input id="skill-query" type="search" maxlength="120" placeholder="技能名称、用途或维护人" value="'+esc(skillQuery)+'"></label><label>分类<select id="skill-category"><option value="">全部分类</option>'+categories.map(c=>'<option value="'+esc(c)+'"'+(c===skillCategory?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select></label>'+
+ (canWrite()?'<label>发布状态<select id="skill-status"><option value="published">已发布</option><option value="unpublished"'+(skillStatus==='unpublished'?' selected':'')+'>已下架</option></select></label>':'')+'</div><div class="skill-grid" id="skills-results"></div>';
+ renderSkillResults();
+}
+async function loadSkills(root,focus=false){
+ try{
+  const result=await api('skills');
+  if(root!==$('#skills-page'))return;
+  skillList=result.skills;renderSkillList(root);
+  if(focus)$('#skills-list-title').focus();
+ }catch(error){
+  if(root===$('#skills-page'))root.innerHTML='<p class="error" role="status">'+esc(error.message)+'</p><button type="button" id="skill-list">重新加载</button>';
+ }
+}
+async function showSkill(root,id,edit=false){
+ const {skill:s}=await api('skills/'+id+(edit?'/edit':''));
+ if(root!==$('#skills-page'))return;
+ if(edit){renderSkillForm(root,s);return}
+ root.innerHTML='<button type="button" id="skill-list">返回技能目录</button><article class="panel skill-detail">'+skillLabels(s)+'<h2 id="skill-heading" tabindex="-1">'+esc(s.name)+'</h2><p>'+esc(s.summary)+'</p><p class="muted">维护人：'+esc(s.owner)+' · 更新于 '+skillDate.format(new Date(s.updated_at))+'</p>'+
+ '<h3>使用说明</h3><p class="skill-instructions">'+esc(s.instructions)+'</p>'+(!s.published?'<p class="muted">技能已下架，重新发布后同事即可使用。</p>':'')+
+ '<div class="tools skill-actions">'+(s.published&&s.launch_url?'<a href="'+esc(s.launch_url)+'" target="_blank" rel="noopener noreferrer">打开使用入口（新标签页）</a>':'')+
+ (s.published&&s.has_file?'<a href="/api/skills/'+esc(s.id)+'/download" download="SKILL.md">下载 SKILL.md</a>':'')+
+ (canManageSkill(s)?'<button data-skill-edit="'+esc(s.id)+'">编辑技能</button><button data-skill-toggle="'+esc(s.id)+'" data-skill-published="'+s.published+'">'+(s.published?'下架技能':'重新发布')+'</button>':'')+'</div></article>';
+ $('#skill-heading').focus();
+}
+function renderSkillForm(root,s={}){
+ const field=(label,name,length,extra='required',type='text')=>'<label>'+label+'<input name="'+name+'" type="'+type+'" maxlength="'+length+'" '+extra+' value="'+esc(s[name]??'')+'"></label>';
+ const area=(label,name,length,extra='required')=>'<label class="wide">'+label+'<textarea name="'+name+'" maxlength="'+length+'" '+extra+'>\n'+esc(s[name]??'')+'</textarea></label>';
+ root.innerHTML='<div class="panel skill-detail"><h2 id="skill-heading" tabindex="-1">'+(s.id?'编辑技能':'发布技能')+'</h2><p class="muted">使用链接与 SKILL.md 至少填写一项。可上传 Markdown 文件，也可直接粘贴文件内容。</p><form id="skill-form" class="skills-form" data-skill-id="'+esc(s.id??'')+'">'+
+ field('技能名称','name',80)+field('分类','category',40,'required placeholder="例如：对账、月结"')+field('版本','version',32,'required placeholder="例如：1.0.0"')+
+ field('使用链接（HTTPS）','launch_url',2048,'placeholder="https://"','url')+area('简介','summary',240)+area('使用说明','instructions',4000,'required placeholder="说明适用场景、所需输入及操作步骤"')+
+ '<label class="wide">导入 SKILL.md<input id="skill-file" type="file" accept=".md,text/markdown"></label>'+area('SKILL.md 文件内容','markdown',100000,'spellcheck="false"')+
+ '<div class="tools wide"><button class="primary" type="submit">'+(s.id?'保存修改':'发布给同事')+'</button><button type="button" '+(s.id?'data-skill-open="'+esc(s.id)+'"':'id="skill-list"')+'>取消</button></div></form></div>';
+ $('#skill-heading').focus();
+}
+const budgetStatus={draft:'草稿',submitted:'待审核',returned:'已退回',approved:'已通过',none:'未填报'};
+const budgetActions={save:'创建草稿',submit:'提交审核',return:'退回修改',approve:'审核通过'};
+const budgetTime=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',dateStyle:'medium',timeStyle:'short'});
+let budgetYear=0,budgetDirty=false,budgetInFlight=false;
+const budgetPage=()=>title('预算管理','部门在线编制年度预算，按月录入明细并提交财务审核。')+
+ '<div id="budget-page"><p role="status" class="muted">正在加载预算…</p></div>';
+const budgetParams=(year,department)=>new URLSearchParams(department?{year,department}:{year});
+const budgetBadge=status=>'<span class="budget-badge budget-'+status+'">'+budgetStatus[status]+'</span>';
+const budgetDate=value=>budgetTime.format(new Date(value));
+const canLeaveBudget=()=>!$('#budget-page')||(!budgetInFlight&&(!budgetDirty||confirm('有修改尚未保存。确定离开？')));
+
+async function loadBudgetList(root){
+ budgetDirty=false;
+ budgetYear||=(demoMode?demoYear:Number(today().slice(0,4)));
+ root.innerHTML='<form id="budget-year" class="panel budget-toolbar"><label>预算年度<input type="number" name="year" aria-label="预算年度" min="2000" max="2099" step="1" value="'+budgetYear+'" required></label><button type="submit">查看年度</button></form><div class="budget-list" aria-live="polite"><p class="muted">正在加载预算…</p></div>';
+ const mount=root.querySelector('.budget-list');
+ try{
+  const year=budgetYear,d=await api('budgets?'+budgetParams(year));
+  if(!mount.isConnected)return;
+  const byDepartment=new Map(d.rows.map(row=>[row.department,row]));
+  const departments=[...new Set([...d.departments,...byDepartment.keys()])].sort((a,b)=>a.localeCompare(b,'zh-CN'));
+  const mine=byDepartment.get(d.department),editable=d.fill&&(!mine||['draft','returned'].includes(mine.status));
+  const open=(department,button)=>'<button type="button" data-budget-open="'+esc(department)+'">'+button+'</button>';
+  const ownSection=d.department?'<section class="panel budget-section"><div class="budget-section-head"><div><h2>我的部门 · '+esc(d.department)+'</h2><p>'+year+' 年 · 年度预算金额 '+(mine?yuan(mine.total):'—')+'</p></div><div class="tools">'+budgetBadge(mine?.status??'none')+(editable||mine?open(d.department,editable?'填报预算':'查看预算'):'')+'</div></div></section>':
+   (!d.review?'<section class="panel budget-section"><h2>尚未分配预算部门</h2><p>请联系管理员在「人员权限」中为你的账号设置所属部门。</p></section>':'');
+  const submitted=d.rows.filter(r=>r.status==='submitted'),approved=d.rows.filter(r=>r.status==='approved');
+  mount.innerHTML=ownSection+(d.review?'<div class="cards budget-metrics">'+card('部门填报进度',d.rows.length+' / '+departments.length,'已建立预算的部门 / 全部部门')+card('待审核预算',yuan(sum(submitted,r=>r.total)),submitted.length+' 个部门')+card('已通过预算',yuan(sum(approved,r=>r.total)),approved.length+' 个部门')+'</div>'+
+   '<section class="panel budget-section"><h2>部门预算汇总</h2>'+(departments.length?grid(['部门','状态','年度预算（人民币）','最近更新','操作'],departments.map(department=>{
+    const row=byDepartment.get(department);
+    return [esc(department),budgetBadge(row?.status??'none'),row?yuan(row.total):'—',row?budgetDate(row.updated_at):'—',row?open(department,row.status==='submitted'?'审核':'查看'):'—'];
+   })): '<p class="empty">暂无预算部门。管理员可在「人员权限」中为同事分配部门。</p>')+'</section>':'');
+  root.querySelectorAll('[data-budget-open]').forEach(button=>button.addEventListener('click',()=>openBudget(root,year,button.dataset.budgetOpen,d.fill?d.department:'',d.review,byDepartment.get(button.dataset.budgetOpen))));
+ }catch(error){if(mount.isConnected)mount.innerHTML='<p class="error">'+esc(error.message)+'</p>'}
+}
+
+async function openBudget(root,year,department,own,review,summary){
+ notify('');
+ if(!summary){renderBudget(root,{department,year,items:[],events:[],total:0,version:0,status:'none'},own,review);return}
+ const controls=[...root.querySelectorAll('button,input')];controls.forEach(control=>control.disabled=true);
+ try{
+  const {budget}=await api('budgets/detail?'+budgetParams(year,department));
+  if(root.isConnected)renderBudget(root,budget,own,review);
+ }catch(error){if(root.isConnected)notify(error.message,true)}
+ finally{controls.forEach(control=>control.disabled=false)}
+}
+
+function budgetEditorRow(row={}){
+ return '<tr><td><input name="subject" aria-label="预算科目" maxlength="80" placeholder="例如：办公设备" value="'+esc(row.subject??'')+'"></td>'+
+  '<td><select name="month" aria-label="预算月份">'+Array.from({length:12},(_,i)=>'<option value="'+(i+1)+'" '+(row.month===i+1?'selected':'')+'>'+(i+1)+' 月</option>').join('')+'</select></td>'+
+  '<td><input name="amount" aria-label="预算金额（元）" inputmode="decimal" maxlength="16" placeholder="0.00" value="'+(row.amount===undefined?'':(row.amount/100).toFixed(2))+'"></td>'+
+  '<td><input name="note" aria-label="明细说明" maxlength="300" placeholder="选填" value="'+esc(row.note??'')+'"></td><td><button type="button" data-budget-remove aria-label="删除此行">删除</button></td></tr>';
+}
+
+function renderBudget(root,budget,own,review){
+ const edit=budget.department===own&&['none','draft','returned'].includes(budget.status);
+ const pendingReview=review&&budget.status==='submitted';
+ const lastReturn=budget.status==='returned'?budget.events.findLast(event=>event.action==='return'):null;
+ root.innerHTML='<p><button type="button" id="budget-back">‹ 返回预算列表</button></p><section class="panel budget-section"><div class="budget-section-head"><div><h2 id="budget-detail-title" tabindex="-1">'+esc(budget.department)+' · '+budget.year+' 年预算</h2><p>人民币元 · 按月填报</p></div>'+budgetBadge(budget.status)+'</div>'+
+ (lastReturn?'<p class="budget-return-note"><b>退回原因：</b>'+esc(lastReturn.note)+'</p>':'')+
+ (edit?'<form id="budget-editor"><p class="muted">同一科目可按月份填写多行。空白行不会保存，金额最多两位小数。</p><div class="scroll"><table class="budget-editor-table"><thead><tr><th>预算科目</th><th>月份</th><th>金额（元）</th><th>说明</th><th>操作</th></tr></thead><tbody id="budget-lines">'+(budget.items.length?budget.items:[{}]).map(budgetEditorRow).join('')+'</tbody></table></div><div class="budget-section-head"><button type="button" id="budget-add">＋ 添加明细</button><strong>年度合计：<output id="budget-total">'+yuan(budget.total)+'</output></strong></div><div class="tools"><button type="submit" value="save">保存草稿</button><button type="submit" value="submit" class="primary">提交审核</button></div></form>':
+  '<p><strong>年度合计：'+yuan(budget.total)+'</strong></p>'+grid(['预算科目','月份','金额（元）','说明'],budget.items.map(row=>[esc(row.subject),row.month+' 月',yuan(row.amount),esc(row.note||'—')])) )+'</section>'+
+ (pendingReview?'<section class="panel budget-section"><h2>审核预算</h2><form id="budget-review"><label>审核意见（退回时必填）<textarea name="note" maxlength="500" rows="3"></textarea></label><div class="tools"><button type="submit" value="approve" class="primary">审核通过</button><button type="submit" value="return">退回修改</button></div></form></section>':'')+
+ (budget.events.length?'<section class="panel budget-section"><h2>填报与审核记录</h2><ul class="budget-events">'+budget.events.toReversed().map(event=>'<li><strong>'+budgetActions[event.action]+'</strong><small>'+budgetDate(event.at)+' · '+esc(event.email)+'</small>'+(event.note?'<p>'+esc(event.note)+'</p>':'')+'</li>').join('')+'</ul></section>':'');
+ root.querySelector('#budget-detail-title').focus();
+ root.querySelector('#budget-back').addEventListener('click',()=>{if(canLeaveBudget()){notify('');loadBudgetList(root)}});
+ const form=root.querySelector('form');if(!form)return;
+ const lines=root.querySelector('#budget-lines');
+ if(edit){
+  form.addEventListener('input',()=>{budgetDirty=true;updateBudgetTotal(lines)});
+  form.addEventListener('change',()=>{budgetDirty=true});
+  root.querySelector('#budget-add').addEventListener('click',()=>{
+   if(lines.rows.length>=200){notify('每个部门每年度最多填写 200 条明细。',true);return}
+   lines.insertAdjacentHTML('beforeend',budgetEditorRow());budgetDirty=true;lines.lastElementChild.querySelector('input').focus();
+  });
+  lines.addEventListener('click',event=>{
+   const button=event.target.closest('[data-budget-remove]');if(!button)return;
+   button.closest('tr').remove();budgetDirty=true;updateBudgetTotal(lines);
+   lines.lastElementChild?.querySelector('input').focus();if(!lines.rows.length)root.querySelector('#budget-add').focus();
+  });
+ }else form.addEventListener('input',()=>{budgetDirty=true});
+ form.addEventListener('submit',async event=>{
+  event.preventDefault();
+  const action=event.submitter?.value||(edit?'save':'approve');
+  const data={action,year:budget.year,department:budget.department,version:budget.version};
+  try{
+   if(edit)data.items=collectBudgetItems(lines);
+   else{
+    data.note=form.elements.note.value.trim();
+    if(action==='return'&&!data.note){form.elements.note.focus();throw Error('请填写退回原因。')}
+   }
+   const prompts={submit:'确认提交审核？提交后暂停编辑，退回后可修改。',approve:'确认通过这份预算？',return:'确认退回这份预算？'};
+   if(prompts[action]&&!confirm(prompts[action]))return;
+   if(budgetInFlight)return;
+   budgetInFlight=true;
+   const controls=[...root.querySelectorAll('button,input,select,textarea')];controls.forEach(control=>control.disabled=true);
+   try{
+    await api('budgets/detail',data);
+    if(root.isConnected){await loadBudgetList(root);notify(({save:'预算草稿已保存。',submit:'预算已提交财务审核。',approve:'预算已审核通过。',return:'预算已退回部门修改。'})[action])}
+   }finally{budgetInFlight=false;controls.forEach(control=>control.disabled=false)}
+  }catch(error){if(root.isConnected)notify(error.message,true)}
+ });
+}
+
+function collectBudgetItems(lines){
+ const items=[];
+ for(const [i,row] of [...lines.rows].entries()){
+  const get=name=>row.querySelector('[name='+name+']').value.trim();
+  const subject=get('subject'),value=get('amount'),note=get('note');
+  if(!subject&&!value&&!note)continue;
+  if(!subject||!value)throw Error('第 '+(i+1)+' 行：请填写预算科目和金额。');
+  let amount;
+  try{amount=budgetAmount(value)}catch(error){throw Error('第 '+(i+1)+' 行：'+error.message)}
+  items.push({subject,note,amount,month:Number(get('month'))});
+ }
+ return items;
+}
+function budgetAmount(value){
+ const amount=cents(value);
+ if(amount>10000000000)throw Error('单条明细金额不得超过 1 亿元。');
+ return amount;
+}
+function updateBudgetTotal(lines){
+ let total=0;
+ for(const field of lines.querySelectorAll('[name=amount]')){
+  try{if(field.value.trim())total+=budgetAmount(field.value)}catch{ $('#budget-total').textContent='请检查金额';return }
+ }
+ $('#budget-total').textContent=yuan(total);
+}
+
+document.addEventListener('submit',event=>{
+ if(event.target.id!=='budget-year')return;
+ event.preventDefault();budgetYear=Number(event.target.elements.year.value);notify('');loadBudgetList($('#budget-page'));
+});
+window.addEventListener('beforeunload',event=>{
+ if($('#budget-page')&&(budgetDirty||budgetInFlight)){event.preventDefault();event.returnValue=''}
+});
+
+function render(){
+ if(!period)period=periods().at(-1)||currentPeriod();
+ $('#identity').innerHTML=demoMode?'v2 · 示例数据':esc(state.email)+' · '+roleName[state.role]+'　'+accountActions;
+ const tabs=state.role==='budget'?[['budgets','预算管理']]:[['dashboard','BI 看板'],...(!demoMode?[['ai-models','AI 模型']]:[]),['statements','财务报表'],['revenue','收入管理'],['ar','应收账款'],['budgets','预算管理'],['skills','技能中心'],...(canWrite()?[['import','Excel 导入']]:[]),...(state.role==='admin'?[['members','人员权限']]:[])];
+ if(!tabs.some(([k])=>k===tab))tab=tabs[0][0];
+ $('#page-title').textContent=tabs.find(([k])=>k===tab)[1];
+ $('#nav').innerHTML=tabs.map(([k,v])=>'<button class="'+(tab===k?'active':'')+'" aria-current="'+(tab===k?'page':'false')+'" data-tab="'+k+'">'+v+'</button>').join('');
+ if(tab!=='dashboard')biStopVoice();
+ $('#view').innerHTML=(periodTabs.includes(tab)&&(tab!=='ar'||!state.erp?.snapshot||erpLegacy)?periodControl():'')+
+  ({dashboard:()=>(demoMode?'':biAssistantPanel())+'<div id="dashboard-data">'+dashboard()+'</div>','ai-models':aiModelsPage,statements:financialStatements,revenue:revenues,ar:receivables,budgets:budgetPage,skills:skillsPage,import:imports,members})[tab]();
+ if(tab==='budgets')loadBudgetList($('#budget-page'));
+ if(tab==='skills')loadSkills($('#skills-page'));
+ if(tab==='ar')bindArMetricHelp();
+ loadErpPanel();
+}
+function csv(text){
+ const rows=[];let row=[],field='',quote=false;
+ for(let i=0;i<text.length;i++){
+  const c=text[i];
+  if(quote){if(c==='"'&&text[i+1]==='"'){field+='"';i++}else if(c==='"')quote=false;else field+=c}
+  else if(c==='"'&&!field)quote=true;
+  else if(c===','){row.push(field);field=''}
+  else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;rows.push([...row,field]);row=[];field=''}
+  else field+=c;
+ }
+ if(quote)throw Error('CSV 中有未闭合的引号');
+ rows.push([...row,field]);return rows;
+}
+async function xlsx(buffer,company=false){
+ const d=new DataView(buffer), bytes=new Uint8Array(buffer), dec=new TextDecoder();
+ let end=d.byteLength-22;
+ while(end>=Math.max(0,d.byteLength-65557)&&d.getUint32(end,true)!==0x06054b50)end--;
+ if(end<0||d.getUint32(end,true)!==0x06054b50)throw Error('无法读取 XLSX 文件');
+ let off=d.getUint32(end+16,true);const files=new Map();
+ for(let n=0;n<d.getUint16(end+10,true);n++){
+  if(d.getUint32(off,true)!==0x02014b50)throw Error('XLSX 压缩目录损坏');
+  const len=d.getUint16(off+28,true),name=dec.decode(bytes.subarray(off+46,off+46+len));
+  files.set(name,{method:d.getUint16(off+10,true),size:d.getUint32(off+20,true),unpacked:d.getUint32(off+24,true),at:d.getUint32(off+42,true)});
+  off+=46+len+d.getUint16(off+30,true)+d.getUint16(off+32,true);
+ }
+ async function xml(name){
+  const f=files.get(name);if(!f)return null;
+  if(f.unpacked>12000000)throw Error('工作表过大');
+  const start=f.at+30+d.getUint16(f.at+26,true)+d.getUint16(f.at+28,true);
+  let data=bytes.subarray(start,start+f.size);
+  if(f.method===8){
+   const reader=new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw')).getReader();
+   const chunks=[];let size=0;
+   for(;;){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>12000000){await reader.cancel();throw Error('工作表过大')}chunks.push(value)}
+   data=await new Blob(chunks).arrayBuffer();
+  }else if(f.method!==0)throw Error('不支持此 XLSX 压缩方式');
+  const doc=new DOMParser().parseFromString(dec.decode(data),'application/xml');
+  if(doc.querySelector('parsererror'))throw Error('无法解析 XLSX 内容');return doc;
+ }
+ const book=await xml('xl/workbook.xml'),rels=await xml('xl/_rels/workbook.xml.rels');
+ const sheets=Array.from(book?.getElementsByTagName('sheet')||[]);
+ const relationships=Array.from(rels?.getElementsByTagName('Relationship')||[]);
+ const strings=await xml('xl/sharedStrings.xml');
+ const rich=node=>Array.from(node.getElementsByTagName('t'),v=>v.textContent).join('');
+ const shared=Array.from(strings?.getElementsByTagName('si')||[],rich);
+ const date1904=['1','true'].includes(book?.querySelector('workbookPr')?.getAttribute('date1904'));
+ async function readSheet(ref){
+  const relId=ref?.getAttribute('r:id');
+  const target=relationships.find(r=>r.getAttribute('Id')===relId)?.getAttribute('Target');
+  const path=target?new URL(target,'https://xlsx.invalid/xl/workbook.xml').pathname.slice(1):'xl/worksheets/sheet1.xml';
+  const sheet=await xml(path);
+  if(!sheet||(!target&&company))throw Error('找不到工作表 '+(ref?.getAttribute('name')||''));
+  return Array.from(sheet.getElementsByTagName('row'),row=>{
+  const values=[];
+  for(const c of row.getElementsByTagName('c')){
+   const letters=c.getAttribute('r')?.match(/^[A-Z]+/)?.[0];if(!letters)continue;
+   let col=0;for(const ch of letters)col=26*col+ch.charCodeAt(0)-64;
+   const t=c.getAttribute('t'),v=c.getElementsByTagName('v')[0]?.textContent??'';
+   if(t==='e'&&!company)throw Error('工作表包含 Excel 错误值');
+   values[col-1]=t==='e'?{error:v}:t==='s'?shared[Number(v)]:t==='inlineStr'?rich(c):v&&(!t||t==='n')?{serial:Number(v),date1904}:v;
+  }return values;
+ });
+ }
+ const names={balance:'合并资产负债表',income:'合并利润表',cashflow:'合并现金流量表'};
+ if(!company)return readSheet(sheets[0]);
+ if(company==='auto'&&!Object.values(names).some(name=>sheets.some(s=>s.getAttribute('name').includes(name))))return readSheet(sheets[0]);
+ const out={};
+ for(const [key,name] of Object.entries(names)){
+  const matches=sheets.filter(s=>s.getAttribute('name').includes(name));
+  if(matches.length!==1)throw Error('需要且只能有一张 '+name);
+  out[key]=await readSheet(matches[0]);
+ }
+ return out;
+}
+const str=v=>String(v?.serial??v??'').trim();
+function dateValue(v,length){
+ if(typeof v==='object'&&v&&Number.isFinite(v.serial)&&v.serial>=0&&v.serial<2958466){
+  const base=v.date1904?'1904-01-01':v.serial<60?'1899-12-31':'1899-12-30';
+  return new Date(Date.parse(base)+Math.floor(v.serial)*86400000).toISOString().slice(0,length);
+ }
+ const s=str(v).replaceAll('/','-');
+ const m=s.match(/^(\d{4})-(\d{1,2})(?:-(\d{1,2}))?$/);
+ return m&&Number(m[2])>=1&&Number(m[2])<=12&&(length===7||m[3])?[m[1],m[2].padStart(2,'0'),...(length===10?[m[3].padStart(2,'0')]:[])].join('-'):'';
+}
+function cents(v,negative=false){
+ const s=str(v);
+ if(!/^-?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d{1,2})?$/.test(s))throw Error('金额须为数字，最多两位小数');
+ const value=Math.round(Number(s.replaceAll(',',''))*100);
+ if(!Number.isSafeInteger(value)||Math.abs(value)>100000000000000||(!negative&&value<0))throw Error('金额超出允许范围');
+ return value;
+}
+async function parse(file,type){
+ if(file.size>5000000)throw Error('文件超过 5 MB');
+ if(type==='company'){
+  if(!/\.xlsx$/i.test(file.name))throw Error('公司合并报表需要 .xlsx 文件');
+  return companyRows(await xlsx(await file.arrayBuffer(),true));
+ }
+ const table=/\.xlsx$/i.test(file.name)?await xlsx(await file.arrayBuffer(),type==='report'?'auto':false):/\.csv$/i.test(file.name)?csv((await file.text()).replace(/^\uFEFF/,'')):null;
+ if(!table)throw Error('请选择 .xlsx 或 .csv 文件');
+ if(!Array.isArray(table))return companyRows(table);
+ const fields=specs[type].fields,head=Array.from(table[0]||[],str),indexes=fields.map(f=>head.indexOf(f));
+ if(indexes.includes(-1))throw Error('缺少列：'+fields.filter((_,i)=>indexes[i]<0).join('、'));
+ const seen=new Set(),out=[];
+ for(const [i,row] of table.slice(1).entries()){
+  if(!row.some(v=>str(v)))continue;
+  try{
+   const [a,b,c,d,e,f]=indexes.map(n=>row[n]);
+   const r=type==='ar'?{id:str(a),customer:str(b),issued:dateValue(c,10),due:dateValue(d,10),amount:cents(e),paid:cents(f)}:{id:dateValue(a,7),revenue:cents(b),cost:cents(c),expense:cents(d),cash:cents(e,true)};
+   const validDate=v=>v&&Number.isFinite(Date.parse(v))&&new Date(v).toISOString().slice(0,10)===v;
+   if(!r.id||r.id.length>120||seen.has(r.id))throw Error('编号或月份为空、过长或重复');
+   if(type==='ar'&&(!r.customer||r.customer.length>120||!validDate(r.issued)||!validDate(r.due)||r.due<r.issued||!r.amount||r.paid>r.amount))throw Error('请核对客户名称、日期和应收金额');
+   seen.add(r.id);out.push(r);
+  }catch(e){throw Error('第 '+(i+2)+' 行：'+e.message)}
+ }
+ if(!out.length||out.length>500)throw Error('请提供 1 至 500 行数据');
+ return out;
+}
+function companyRows(sheets){
+ const clean=v=>str(v).replace(/\s/g,'');
+ const starts=(value,name)=>clean(value).replace(/^(?:[一二三四五六七八九十]+、|[加减][：:])/,'').startsWith(name);
+ function amount(v){
+  if(v?.error)throw Error('Excel 单元格包含错误，请在 Excel 重算后保存');
+  if(!str(v))return null;
+  const n=typeof v==='object'?v.serial:Number(str(v).replaceAll(',',''));
+  const scaled=Math.round(Math.abs(n)*100)*Math.sign(n);
+  if(!Number.isSafeInteger(scaled)||Math.abs(scaled)>100000000000000)throw Error('报表数值无效');
+  return scaled;
+ }
+ function optional(v){try{return amount(v)}catch{return null}}
+ const close=sheets.income.find(row=>dateValue(row[0],10));
+ const period=close&&dateValue(close[0],7);
+ if(!period)throw Error('合并利润表缺少报表日期');
+ const [year,last]=period.split('-').map(Number);
+ if(year<2000||year>2099)throw Error('报表日期年份无效');
+ const headings=rows=>rows.find(row=>row.includes('1月')&&row.includes('12月'));
+ const cumulativeCol=row=>row.findIndex(v=>clean(v)==='本年累计');
+ const incomeMonths=headings(sheets.income),cashMonths=headings(sheets.cashflow);
+ const cumulative=!incomeMonths&&!cashMonths;
+ const incomeHead=incomeMonths||(cumulative&&sheets.income.find(row=>cumulativeCol(row)>0));
+ const cashHead=cashMonths||(cumulative&&sheets.cashflow.find(row=>cumulativeCol(row)>0));
+ if(!incomeHead||!cashHead)throw Error('利润表或现金流量表缺少匹配的月份列或本年累计列');
+ const balance=[];
+ const balanceHead=sheets.balance.findIndex(row=>clean(row[1])==='期末'&&clean(row[4])==='期末');
+ if(balanceHead<0)throw Error('找不到资产负债表的期末列');
+ for(const row of sheets.balance.slice(balanceHead+1)){
+  for(const c of [0,3]){
+   const name=str(row[c]),a=optional(row[c+1]),b=optional(row[c+2]);
+   if(name&&(a!==null||b!==null))balance.push([name,a,b]);
+  }
+ }
+ function required(rows,name,col){
+  const row=rows.find(r=>starts(r[0],name));
+  const value=row&&amount(row[col]);
+  if(value==null)throw Error('第 '+(col)+' 月对应列的 '+name+' 为空');
+  return value;
+ }
+ const detail=(rows,header,col)=>rows.slice(rows.indexOf(header)+1).flatMap(r=>{
+  const name=str(r[0]),a=cumulative?null:optional(r[col]),b=optional(r[cumulativeCol(header)]);
+  return name&&(a!==null||b!==null)?[[name,a,b]]:[];
+ });
+ return Array.from({length:cumulative?1:last},(_,i)=>{
+  const m=cumulative?last:i+1,inc=cumulative?cumulativeCol(incomeHead):incomeHead.indexOf(m+'月'),cash=cumulative?cumulativeCol(cashHead):cashHead.indexOf(m+'月');
+  if(inc<1||cash<1)throw Error('找不到 '+m+' 月列');
+  const expense=sum(['销售费用','管理费用','财务费用','研发费用'],name=>{
+   const row=sheets.income.find(r=>starts(r[0],name));
+   return row?amount(row[inc])??0:0;
+  });
+  return {id:year+'-'+String(m).padStart(2,'0'),cumulative,
+   revenue:required(sheets.income,'营业收入',inc),cost:required(sheets.income,'营业成本',inc),expense,
+   operating:required(sheets.income,'营业利润',inc),cash:required(sheets.cashflow,'经营活动产生的现金流量净额',cash),
+   company:{balance:m===last?balance:[],income:detail(sheets.income,incomeHead,inc),cashflow:detail(sheets.cashflow,cashHead,cash)}};
+ });
+}
+const wecomDialog=$('#wecom-dialog');
+const wecomGroup=$('#wecom-group');
+const wecomSend=$('#wecom-send');
+const wecomPreviewView=$('#wecom-preview');
+const wecomViewDispatch=$('#wecom-view-dispatch');
+const wecomSelected=new Set();
+let wecomPreview=null,wecomLoading=false,wecomSending=false,wecomSent=false;
+function wecomStatus(message,bad=false){
+ const status=$('#wecom-status');
+ status.textContent=message;
+ status.className=bad?'error':'muted';
+}
+function updateWecomControls(){
+ wecomGroup.disabled=wecomLoading||wecomSending||wecomSent||!wecomPreview?.groups.some(group=>group.configured);
+ wecomSend.disabled=wecomGroup.disabled||!wecomGroup.value||!wecomSelected.size;
+ $('#wecom-close').disabled=wecomLoading||wecomSending;
+ const selectAll=$('#wecom-select-all');
+ if(!selectAll)return;
+ const rows=wecomPreview.report.rows,locked=wecomLoading||wecomSending||wecomSent;
+ selectAll.checked=wecomSelected.size===rows.length;
+ selectAll.indeterminate=wecomSelected.size>0&&wecomSelected.size<rows.length;
+ selectAll.disabled=locked;
+ for(const input of wecomPreviewView.querySelectorAll('[data-wecom-customer]')){
+  input.checked=wecomSelected.has(Number(input.dataset.wecomCustomer));
+  input.disabled=locked;
+ }
+ const total=sum([...wecomSelected],i=>rows[i].cents);
+ $('#wecom-selected-count').textContent='已选 '+wecomSelected.size+' / '+rows.length+' 家，未收合计 '+yuan(total);
+}
+function renderWecomPreview({asOf,rows}){
+ return '<p>截至 '+esc(asOf)+' · ERP 订单到期日核实</p>'+(rows.length?
+  '<p id="wecom-selected-count" role="status"></p>'+grid(
+   ['<div class="wecom-select-cell"><input type="checkbox" id="wecom-select-all" aria-label="全选客户" title="全选客户"></div>','客户','逾期超过 180 天未收金额'],
+   rows.map((row,i)=>['<div class="wecom-select-cell"><input type="checkbox" id="wecom-customer-'+i+'" data-wecom-customer="'+i+'"></div>',
+    '<label class="wecom-customer-name" for="wecom-customer-'+i+'">'+esc(row.customer)+'</label>',yuan(row.cents)])):'');
+}
+async function openWecom(){
+ if(wecomDialog.open)return;
+ wecomPreview=null;wecomLoading=true;wecomSent=false;
+ wecomSelected.clear();
+ wecomViewDispatch.hidden=true;
+ delete wecomViewDispatch.dataset.dispatchId;
+ wecomGroup.innerHTML='<option value="">请选择群组</option>';
+ wecomPreviewView.innerHTML='';
+ wecomStatus('正在加载逾期明细…');
+ updateWecomControls();
+ wecomDialog.showModal();
+ try{
+  const data=await api('erp/overdue-wecom');
+  if(!wecomDialog.open)return;
+  wecomPreview=data;
+  for(const group of data.groups){
+   const option=new Option(group.name+(group.configured?'':'（机器人待配置）'),group.id);
+   option.disabled=!group.configured;
+   wecomGroup.add(option);
+  }
+  const {rows}=data.report;
+  wecomPreviewView.innerHTML=renderWecomPreview(data.report);
+  const available=data.groups.some(group=>group.configured);
+  if(!available&&data.groups.length)wecomGroup.value=data.groups[0].id;
+  wecomStatus(!rows.length?'没有符合条件的逾期余额。':available?'请勾选客户并选择接收群组。':'群机器人待配置，请联系管理员。');
+ }catch(error){wecomStatus(error.message,true)}
+ finally{wecomLoading=false;updateWecomControls()}
+}
+wecomGroup.addEventListener('change',updateWecomControls);
+wecomPreviewView.addEventListener('change',event=>{
+ const input=event.target;
+ if(wecomLoading||wecomSending||wecomSent)return;
+ if(input.id==='wecom-select-all'){
+  wecomSelected.clear();
+  if(input.checked)for(const i of wecomPreview.report.rows.keys())wecomSelected.add(i);
+ }else if(input.dataset.wecomCustomer!==undefined){
+  const index=Number(input.dataset.wecomCustomer);
+  if(input.checked)wecomSelected.add(index);else wecomSelected.delete(index);
+ }else return;
+ updateWecomControls();
+});
+wecomDialog.addEventListener('cancel',event=>{if(wecomLoading||wecomSending)event.preventDefault()});
+$('#wecom-close').addEventListener('click',()=>{if(!wecomLoading&&!wecomSending)wecomDialog.close()});
+$('#wecom-form').addEventListener('submit',async event=>{
+ event.preventDefault();
+ if(wecomSend.disabled)return;
+ const groupId=wecomGroup.value;
+ const groupRevision=wecomPreview.groups.find(group=>group.id===groupId).revision;
+ const customerIndexes=[...wecomSelected];
+ wecomSending=true;updateWecomControls();
+ wecomStatus('正在发送到企业微信…');
+ try{
+  const result=await api('erp/overdue-wecom',{groupId,groupRevision,version:wecomPreview.version,customerIndexes});
+  wecomSent=true;
+  const format=result.delivery==='file'?'（明细文件）。':'。';
+  wecomStatus('已将 '+customerIndexes.length+' 家客户的明细发送到「'+result.group+'」'+format);
+  if(result.batchId){
+   wecomViewDispatch.dataset.dispatchId=result.batchId;
+   wecomViewDispatch.hidden=false;
+  }
+ }catch(error){wecomStatus(error.message,true)}
+ finally{wecomSending=false;updateWecomControls()}
+});
+const followupDialog=$('#followup-dialog');
+const followupView=$('#followup-view');
+const followupClose=$('#followup-close');
+const dispatchApi='erp/wecom-dispatches';
+const dispatchStatus={sending:'发送中',sent:'已发送',failed:'发送失败',unconfirmed:'发送结果待确认'};
+const followupTime=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',dateStyle:'medium',timeStyle:'medium'});
+let followupSequence=0,followupSaving=false,followupPage=1,followupBatch,followupCustomer,feedbackAttempt;
+const dispatchDate=value=>followupTime.format(new Date(value));
+function followupStatus(message,error=false){
+ const element=$('#followup-status');
+ element.textContent=message;
+ element.className=error?'error':'muted';
+}
+async function loadFollowup(path,renderData){
+ const sequence=++followupSequence;
+ followupView.innerHTML='';
+ followupStatus('正在加载…');
+ try{
+  const data=await api(path);
+  if(sequence!==followupSequence||!followupDialog.open)return;
+  followupStatus('');
+  renderData(data);
+  $('#followup-heading').focus();
+ }catch(error){
+  if(sequence===followupSequence&&followupDialog.open){
+   followupStatus(error.message,true);
+   followupView.innerHTML='<button type="button" data-followup-page="'+followupPage+'">返回推送记录</button>';
+  }
+ }
+}
+function showDispatches(page=1){
+ followupPage=page;
+ return loadFollowup(dispatchApi+'?page='+page,({batches,next})=>{
+  followupView.innerHTML=batches.length?grid(['推送时间','接收群','客户数','跟进反馈','状态','操作'],
+   batches.map(batch=>[dispatchDate(batch.sent_at||batch.created_at),esc(batch.group_name),batch.customer_count,
+     batch.status==='sent'?batch.feedback_count+' / '+batch.customer_count:'—',dispatchStatus[batch.status],
+     '<button type="button" data-followup-batch="'+esc(batch.id)+'">查看</button>'])):
+   '<p class="empty">暂无推送记录。启用跟进功能后的推送会显示在这里。</p>';
+  if(page>1||next)followupView.insertAdjacentHTML('beforeend','<div class="tools">'+
+    (page>1?'<button type="button" data-followup-page="'+(page-1)+'">上一页</button>':'')+'<span>第 '+page+' 页</span>'+
+    (next?'<button type="button" data-followup-page="'+(page+1)+'">下一页</button>':'')+'</div>');
+ });
+}
+function showDispatch(id){
+ return loadFollowup(dispatchApi+'/'+id,data=>{
+  followupBatch=data;
+  const {batch,rows}=data;
+  const sent=batch.status==='sent';
+  followupView.innerHTML='<button type="button" data-followup-page="'+followupPage+'">返回推送记录</button>'+
+    '<p><b>'+esc(batch.group_name)+'</b> · '+dispatchStatus[batch.status]+' · '+dispatchDate(batch.sent_at||batch.created_at)+'</p>'+
+    '<p class="muted">账龄截至 '+esc(batch.as_of)+' · '+rows.length+' 家客户 · 未收合计 '+yuan(batch.total)+
+    (sent?' · 已反馈 '+rows.filter(row=>row.feedbackCount).length+' 家':'')+'</p>'+
+    '<div class="tools"><label>搜索客户<input id="followup-search" type="search" maxlength="120"></label>'+
+    (sent?'<label>反馈状态<select id="followup-filter"><option value="all">全部</option><option value="pending">待反馈</option><option value="done">已反馈</option></select></label>':'')+
+    '</div><div id="followup-customers"></div>';
+  renderDispatchCustomers();
+ });
+}
+function renderDispatchCustomers(){
+ const {batch,rows}=followupBatch;
+ const query=$('#followup-search').value.trim().toLowerCase();
+ const filter=$('#followup-filter')?.value??'all';
+ const sent=batch.status==='sent';
+ const matching=rows.filter(row=>row.customer.toLowerCase().includes(query)&&
+   (filter==='all'||Boolean(row.feedbackCount)===(filter==='done')));
+ $('#followup-customers').innerHTML=grid(['客户','推送时未收金额',...(sent?['反馈记录','操作']:[])],
+   matching.map(row=>[esc(row.customer),yuan(row.cents),...(sent?[
+     row.feedbackCount?row.feedbackCount+' 条':'待反馈',
+     '<button type="button" data-followup-customer="'+row.index+'">'+(row.feedbackCount?'查看 / 添加反馈':'填写反馈')+'</button>']:[])]));
+}
+function renderFeedback(rows){
+ $('#followup-notes').innerHTML=rows.length?'<ul class="followup-notes">'+rows.map(row=>
+   '<li><small>'+dispatchDate(row.created_at)+' · '+esc(row.author)+'</small><p>'+esc(row.result)+'</p></li>').join('')+'</ul>':
+   '<p class="muted">尚无反馈。</p>';
+}
+function showCustomerFeedback(index){
+ const {batch,rows}=followupBatch;
+ const customer=rows.find(row=>row.index===index);
+ if(!customer)return;
+ followupCustomer=dispatchApi+'/'+batch.id+'/feedback?customer='+index;
+ feedbackAttempt=null;
+ return loadFollowup(followupCustomer,({feedback})=>{
+  followupView.innerHTML='<button type="button" data-followup-batch="'+esc(batch.id)+'">返回客户清单</button>'+
+    '<h3>'+esc(customer.customer)+'</h3><p class="muted">推送时未收 '+yuan(customer.cents)+'</p>'+
+    '<form id="followup-form"><label>跟进结果<textarea name="result" maxlength="1000" required placeholder="填写客户回复、承诺付款日期或下一步安排"></textarea></label>'+
+    '<div class="tools"><button type="submit" class="primary">保存反馈</button></div></form>'+
+    '<h3>反馈记录</h3><div id="followup-notes"></div>';
+  renderFeedback(feedback);
+ });
+}
+function openFollowup(batchId){
+ followupDialog.showModal();
+ followupPage=1;
+ return batchId?showDispatch(batchId):showDispatches();
+}
+wecomViewDispatch.addEventListener('click',()=>{
+ wecomDialog.close();
+ openFollowup(wecomViewDispatch.dataset.dispatchId);
+});
+followupClose.addEventListener('click',()=>followupDialog.close());
+followupDialog.addEventListener('cancel',event=>{if(followupSaving)event.preventDefault()});
+followupDialog.addEventListener('close',()=>{if(!followupDialog.open)followupSequence++});
+followupView.addEventListener('input',event=>{if(event.target.id==='followup-search')renderDispatchCustomers()});
+followupView.addEventListener('change',event=>{if(event.target.id==='followup-filter')renderDispatchCustomers()});
+followupView.addEventListener('click',event=>{
+ const button=event.target.closest('button');
+ if(!button||followupSaving)return;
+ if(button.dataset.followupPage)showDispatches(Number(button.dataset.followupPage));
+ if(button.dataset.followupBatch)showDispatch(button.dataset.followupBatch);
+ if(button.dataset.followupCustomer!==undefined)showCustomerFeedback(Number(button.dataset.followupCustomer));
+});
+followupView.addEventListener('submit',async event=>{
+ if(event.target.id!=='followup-form')return;
+ event.preventDefault();
+ if(followupSaving)return;
+ const field=event.target.elements.result;
+ const result=field.value.trim();
+ if(!result){followupStatus('请填写跟进结果。',true);field.focus();return}
+ if(feedbackAttempt?.result!==result)feedbackAttempt={id:crypto.randomUUID(),result};
+ followupSaving=true;followupClose.disabled=true;
+ const controls=[...followupView.querySelectorAll('button,textarea')];
+ controls.forEach(control=>control.disabled=true);
+ followupStatus('正在保存…');
+ try{
+  const data=await api(followupCustomer,feedbackAttempt);
+  field.value='';feedbackAttempt=null;
+  renderFeedback(data.feedback);
+  followupStatus('已保存反馈。');
+ }catch(error){followupStatus(error.message,true)}
+ finally{
+  followupSaving=false;followupClose.disabled=false;
+  controls.forEach(control=>control.disabled=false);
+  field.focus();
+ }
+});
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('button');if(!b)return;
+ if(b.id==='wecom-open'){openWecom();return}
+ if(b.id==='followup-open'){openFollowup();return}
+ if(b.dataset.tab){if(tab===b.dataset.tab&&tab==='budgets')return;if(!canLeaveBudget())return;tab=b.dataset.tab;erpLegacy=false;erpPage=1;erpQuery='';history.replaceState(null,'',['skills','ar','budgets','members','ai-models'].includes(tab)?'#'+tab:location.pathname+location.search);notify('');render();document.querySelector('[data-tab="'+tab+'"]')?.focus();return}
+ if(b.id==='bi-voice'){biStartVoice();return}
+ if(b.dataset.biExample!==undefined){
+  biStopVoice();const input=$('#bi-prompt');input.value=biDraft=biExamples[Number(b.dataset.biExample)];
+  input.focus();return;
+ }
+ if(b.dataset.memberEdit!==undefined){const m=state.members[Number(b.dataset.memberEdit)],form=$('#member');form.elements.email.value=m.email;form.elements.role.value=m.role;form.elements.department.value=m.department??'';form.elements.department.focus();return}
+ const skillsRoot=b.closest('#skills-page');
+ if(skillsRoot&&(b.id==='skill-new'||b.id==='skill-list'||b.dataset.skillOpen||b.dataset.skillEdit||b.dataset.skillToggle)){
+  notify('');
+  if(b.id==='skill-new'){renderSkillForm(skillsRoot);return}
+  if(b.id==='skill-list'){b.disabled=true;await loadSkills(skillsRoot,true);return}
+  const buttons=[...skillsRoot.querySelectorAll('button')];
+  buttons.forEach(button=>button.disabled=true);
+  try{
+   if(b.dataset.skillToggle){
+    const published=b.dataset.skillPublished==='1';
+    if(published&&!confirm('下架后，同事将暂时无法查看或下载此技能。确定下架？'))return;
+    await api('skills/'+b.dataset.skillToggle,{action:published?'unpublish':'publish'});
+    if(skillsRoot!==$('#skills-page'))return;
+    await showSkill(skillsRoot,b.dataset.skillToggle);
+    if(skillsRoot===$('#skills-page'))notify(published?'技能已下架。':'技能已重新发布。');
+   }else await showSkill(skillsRoot,b.dataset.skillOpen||b.dataset.skillEdit,Boolean(b.dataset.skillEdit));
+  }catch(error){if(skillsRoot===$('#skills-page'))notify(error.message,true)}
+  finally{buttons.forEach(button=>button.disabled=false)}
+  return;
+ }
+ if(b.dataset.period){period=b.dataset.period;erpPage=1;render();document.querySelector('[data-period="'+period+'"]')?.focus();return}
+ if(b.dataset.biMonth){period=b.dataset.biMonth;render();document.querySelector('[data-bi-month="'+period+'"]')?.focus();return}
+ if(b.dataset.biRisk){biRiskMode=b.dataset.biRisk;render();document.querySelector('[data-bi-risk="'+biRiskMode+'"]')?.focus();return}
+ if(b.dataset.erpMonth){period=b.dataset.erpMonth;tab='revenue';erpPage=1;erpQuery='';render();return}
+ if(b.dataset.erpPage){erpPage=Number(b.dataset.erpPage);loadErpPanel();return}
+ if(b.dataset.erpLegacy){erpLegacy=b.dataset.erpLegacy==='1';render();return}
+ if(b.dataset.statement){selectStatement(b.dataset.statement);return}
+ try{
+  if(b.id==='template'){
+   const s=specs[kind],url=URL.createObjectURL(new Blob(['\uFEFF'+s.fields.join(',')+'\r\n'+s.sample.join(',')+'\r\n'],{type:'text/csv;charset=utf-8'}));
+   const a=document.createElement('a');a.href=url;a.download=s.title+'模板.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+  if(b.id==='commit'){b.disabled=true;const result=await api('import',{type:kind==='company'?'report':kind,rows:pending});pending=null;await refresh();notify('已导入 '+result.count+(kind==='company'?' 个月。':' 行。'))}
+  if(b.dataset.payment){
+   const row=state.ar.find(r=>r.id===b.dataset.payment);
+   const value=prompt('登记回款 · '+row.id+' · 当前余额 '+yuan(balance(row))+'。输入人民币金额（元）');
+   if(value===null)return;
+   b.disabled=true;await api('payment',{id:row.id,amount:cents(value)});await refresh();notify('回款已登记。');
+  }
+ }catch(error){notify(error.message,true)}finally{b.disabled=false}
+});
+document.addEventListener('change',async e=>{
+ if(['bi-request-model','bi-preferred-model'].includes(e.target.id)){biSetModel(e.target.value);return}
+ const el=e.target;
+ if(el.id==='skill-category'){skillCategory=el.value;renderSkillResults();return}
+ if(el.id==='skill-status'){skillStatus=el.value;skillCategory='';renderSkillList($('#skills-page'));$('#skill-status').focus();return}
+ if(el.id==='skill-file'&&el.files[0]){
+  const file=el.files[0],form=el.form;
+  const submit=form.querySelector('button[type=submit]');submit.disabled=true;
+  try{
+   if(!/\.md$/i.test(file.name)||file.size>400000)throw Error('请选择有效的 .md 文件（最多 100,000 字符）。');
+   const content=await file.text();
+   if(!content.trim()||content.length>100000)throw Error('Markdown 文件为空或超过 100,000 字符。');
+   if(el.isConnected&&el.files[0]===file){form.elements.markdown.value=content;notify('已导入文件内容。')}
+  }catch(error){if(el.isConnected&&el.files[0]===file)notify(error.message,true)}
+  finally{if(el.files[0]===file){el.value='';submit.disabled=false}}
+  return;
+ }
+ if(el.id==='periodYear'){period=el.value+period.slice(4);erpPage=1;render();$('#periodYear').focus()}
+ if(el.id==='filter'){filter=el.value;render()}
+ if(el.id==='kind'){kind=el.value;pending=null;notify('');render()}
+ if(el.id==='file'&&el.files[0]){
+  const type=kind;pending=null;notify('正在读取文件…');
+  try{const rows=await parse(el.files[0],type);if(kind===type){pending=rows;notify('请核对预览后确认导入。')}}
+  catch(error){notify(error.message,true)}
+  render();
+ }
+});
+document.addEventListener('input',e=>{
+ if(e.target.id==='bi-prompt'){biDraft=e.target.value;biStopVoice();return}
+ if(e.target.id==='skill-query'){skillQuery=e.target.value;renderSkillResults();return}
+ if(e.target.id==='query'){const pos=e.target.selectionStart;query=e.target.value;render();const field=$('#query');field.focus();field.setSelectionRange(pos,pos)}
+});
+function selectStatement(key){
+ statement=key;
+ render();
+ $('#statement-'+key)?.focus();
+}
+document.addEventListener('pointerdown',e=>{
+ if(!e.target.closest('.ar-metric'))for(const card of document.querySelectorAll('.ar-metric[data-pinned]'))showArMetricHelp(card,false);
+});
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape')for(const card of document.querySelectorAll('.ar-metric:has(.ar-metric-tip:not([hidden]))'))showArMetricHelp(card,false);
+ const key=e.target.dataset.statement;
+ if(!key||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+ e.preventDefault();
+ const i=statementTabs.findIndex(([value])=>value===key),count=statementTabs.length;
+ const next={ArrowLeft:(i+count-1)%count,ArrowRight:(i+1)%count,Home:0,End:count-1}[e.key];
+ selectStatement(statementTabs[next][0]);
+});
+document.addEventListener('submit',async e=>{
+ if(e.target.id==='bi-request'){e.preventDefault();await biSubmit();return}
+ if(e.target.id==='skill-form'){
+  e.preventDefault();
+  const form=e.target,root=$('#skills-page'),id=form.dataset.skillId;
+  const data=Object.fromEntries(new FormData(form));
+  if(!data.launch_url.trim()&&!data.markdown.trim()){notify('请提供 HTTPS 使用链接或 SKILL.md 文件内容。',true);form.elements.launch_url.focus();return}
+  if(form.querySelector('button[type=submit]').disabled)return;
+  const controls=[...form.elements];controls.forEach(control=>control.disabled=true);
+  notify('');
+  try{
+   const result=await api('skills'+(id?'/'+id:''),data);
+   if(root!==$('#skills-page'))return;
+   if(!id){skillStatus='published';skillCategory='';skillQuery=''}
+   await showSkill(root,result.id);
+   if(root===$('#skills-page'))notify(id?'技能修改已保存。':'技能已发布，同事现在可以使用。');
+  }catch(error){if(root===$('#skills-page'))notify(error.message,true)}
+  finally{controls.forEach(control=>control.disabled=false)}
+  return;
+ }
+ if(e.target.id==='erp-search'){e.preventDefault();erpQuery=String(new FormData(e.target).get('q')??'').trim();erpPage=1;loadErpPanel();return}
+ if(e.target.id!=='member')return;e.preventDefault();
+ const b=e.target.querySelector('button');b.disabled=true;
+ try{await api('members',Object.fromEntries(new FormData(e.target)));await refresh();notify('成员权限已更新。')}
+ catch(error){notify(error.message,true)}finally{b.disabled=false}
+});
+window.addEventListener('hashchange',()=>{
+ if(!state)return;
+ if(!canLeaveBudget()){history.replaceState(null,'','#budgets');return}
+ if(location.hash==='#ar'||location.hash.startsWith('#ar?')){tab='ar';erpLegacy=false;erpPage=1;erpQuery='';render()}
+ else if(location.hash==='#skills'){tab='skills';render()}
+ else if(location.hash==='#ai-models'){tab='ai-models';render()}
+ else if(location.hash==='#budgets'){tab='budgets';render()}
+ else if(location.hash==='#members'&&state.role==='admin'){tab='members';render()}
+ else if(['skills','budgets','members','ai-models'].includes(tab)){tab='dashboard';render()}
+});
+refresh().catch(error=>{
+ $('#view').innerHTML=title('财务管理工作台',esc(error.message))+(localAccounts||demoMode?'':'<a href="/signin-with-chatgpt" target="_top">使用 ChatGPT 登录</a>');
+ if(localAccounts)$('#identity').innerHTML=accountActions;
+});
+let polling=false;
+if(!demoMode)setInterval(async ()=>{
+ if(polling||!state||document.hidden||!periodTabs.includes(tab))return;
+ polling=true;
+ const before=state;
+ try{
+  const next=await api('state');
+  if(state===before&&periodTabs.includes(tab)&&JSON.stringify(next)!==JSON.stringify(before)){
+   applyState(next);
+   if(tab==='dashboard'&&before.role===next.role&&before.email===next.email&&JSON.stringify(before.bi)===JSON.stringify(next.bi)){
+    const year=$('#periodYear'),years=[currentPeriod(),period,...periods()].map(value=>value.slice(0,4));
+    if(new Set(years).size!==year.options.length||[...year.options].some(option=>!years.includes(option.value))){
+     const focus=year===document.activeElement;
+     $('.period-control').outerHTML=periodControl();
+     if(focus)$('#periodYear').focus();
+    }
+    const details=[...$('#dashboard-data').querySelectorAll('details')].map(el=>el.open);
+    $('#dashboard-data').innerHTML=dashboard();
+    $('#dashboard-data').querySelectorAll('details').forEach((el,i)=>{if(details[i])el.open=true});
+    return;
+   }
+   const queryFocused=document.activeElement?.id==='query';
+   const pos=queryFocused?document.activeElement.selectionStart:0;
+   render();
+   if(queryFocused&&$('#query')){$('#query').focus();$('#query').setSelectionRange(pos,pos)}
+  }
+ }catch(error){notify(error.message,true)}
+ finally{polling=false}
+},15000);
+</script></html>
