@@ -120,6 +120,11 @@ function periodControl(){
 const periodReceivables=()=>state.ar.filter(r=>r.issued.startsWith(period+'-'));
 const canWrite=()=>['admin','finance'].includes(state.role);
 const notify=(message,bad=false)=>{$('#notice').textContent=message;$('#notice').className=bad?'error':'ok'};
+function setTabHash(hash){
+ if(location.protocol==='file:'){
+  if(location.hash!==hash)location.hash=hash;
+ }else history.replaceState(null,'',hash||location.pathname+location.search);
+}
 async function api(path,data){
  if(demoMode)return demoApi(path,data);
  const r=await fetch('/api/'+path,data===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
@@ -775,7 +780,7 @@ document.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
  if(b.id==='wecom-open'){openWecom();return}
  if(b.id==='followup-open'){openFollowup();return}
- if(b.dataset.tab){if(tab===b.dataset.tab&&tab==='budgets')return;if(!canLeaveBudget())return;tab=b.dataset.tab;erpLegacy=false;erpPage=1;erpQuery='';history.replaceState(null,'',['skills','ar','budgets','members','ai-models'].includes(tab)?'#'+tab:location.pathname+location.search);notify('');render();document.querySelector('[data-tab="'+tab+'"]')?.focus();return}
+ if(b.dataset.tab){if(tab===b.dataset.tab&&tab==='budgets')return;if(!canLeaveBudget())return;tab=b.dataset.tab;erpLegacy=false;erpPage=1;erpQuery='';setTabHash(['skills','ar','budgets','members','ai-models'].includes(tab)?'#'+tab:'');notify('');render();document.querySelector('[data-tab="'+tab+'"]')?.focus();return}
  if(b.id==='bi-voice'){biStartVoice();return}
  if(b.dataset.biExample!==undefined){
   biStopVoice();const input=$('#bi-prompt');input.value=biDraft=biExamples[Number(b.dataset.biExample)];
