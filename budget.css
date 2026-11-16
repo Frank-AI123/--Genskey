@@ -1,0 +1,20 @@
+.budget-toolbar{margin:18px 0;align-items:end;gap:10px;padding:14px 18px}
+.budget-toolbar input{width:8rem}
+.budget-section{margin:16px 0}
+.budget-section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.budget-section-head h2,.budget-section-head p,.budget-section-head .tools{margin:0}
+.budget-section-head p{color:#526478;margin-top:5px}
+.budget-metrics{margin:16px 0}
+.budget-badge{display:inline-block;border-radius:20px;padding:4px 10px;background:#edf1f5;color:#46586b;white-space:nowrap;font-size:13px;font-weight:600}
+.budget-submitted{background:#e7efff;color:#254888}.budget-returned{background:#fff0dc;color:#794517}.budget-approved{background:#e4f4ec;color:#12664a}
+.budget-return-note{white-space:pre-wrap;overflow-wrap:anywhere;background:#fff7e9;border-left:4px solid #c78939;padding:10px 14px;color:#6a4113}
+#budget-editor,#budget-review{display:grid;align-items:start;margin:12px 0 0}
+#budget-editor .tools,#budget-review .tools{margin:4px 0 0}
+.budget-editor-table td{padding:8px 6px}
+.budget-editor-table input{width:100%;min-width:9rem}.budget-editor-table input[name=note]{min-width:11rem}
+.budget-editor-table select{min-width:5.5rem}
+#budget-review textarea{font:inherit;color:inherit;padding:9px 12px;border:1px solid #b8c9d6;border-radius:8px;resize:vertical;width:100%}
+.budget-events{list-style:none;margin:0;padding:0}
+.budget-events li{padding:10px 0;border-top:1px solid var(--stroke);overflow-wrap:anywhere}
+.budget-events small{margin-left:12px}.budget-events p{margin:4px 0 0;white-space:pre-wrap}
+.budget-section td:nth-child(4){white-space:normal;overflow-wrap:anywhere;min-width:9rem}

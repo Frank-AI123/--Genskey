@@ -1,5 +1,12 @@
+*.sqlite
+*.sqlite-*
+__pycache__/
+.finance-service.*.log
+finance-wecom.local.json
+finance-erp-payment-orgs.local.json
+*.log
+.env
+.env.*
+/backup/
 /dist/
-/finance.sqlite*
-/monthly-template.xlsx
-/.openai/
-/.env
+/.release-v2*/
